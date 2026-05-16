@@ -43,7 +43,7 @@ def send_alert(msg, reply):
         pass
 
 # ==========================================
-# HÀM XỬ LÝ LÕI AI GEMINI (ĐÃ THÊM MÀNG LỌC JSON CHỐNG LỖI)
+# HÀM XỬ LÝ LÕI AI GEMINI (ĐÃ THÊM MÀNG LỌC & BÁO LỖI THÂN THIỆN)
 # ==========================================
 def get_ai_response(user_input):
     prompt = f"""Bạn là chuyên gia tâm lý MindGuard AI. Hãy phản hồi: '{user_input}'.
@@ -54,12 +54,12 @@ def get_ai_response(user_input):
         response = model.generate_content(prompt)
         raw_text = response.text.strip()
         
-        # In kết quả gốc ra màn hình Log của Render để theo dõi
+        # In kết quả gốc ra màn hình Log
         print("\n=== AI TRẢ VỀ GỐC ===", flush=True)
         print(raw_text, flush=True) 
         print("=====================\n", flush=True)
         
-        # Màng lọc JSON: Tự động dò tìm và cắt lấy phần nằm trong ngoặc {}
+        # Màng lọc JSON
         start_idx = raw_text.find('{')
         end_idx = raw_text.rfind('}')
         
@@ -67,14 +67,18 @@ def get_ai_response(user_input):
             clean_json_str = raw_text[start_idx:end_idx+1]
             return json.loads(clean_json_str)
         else:
-            # Báo lỗi thẳng ra màn hình chat nếu AI lách luật không trả về JSON
             return {"level": "Error", "reply": f"Lỗi định dạng AI: {raw_text}"}
             
     except Exception as e:
-        # Báo lỗi thẳng ra màn hình chat nếu gặp trục trặc hệ thống (hết quota, rớt mạng...)
-        print(f"\n=== LỖI HỆ THỐNG: {str(e)} ===\n", flush=True)
-        return {"level": "Error", "reply": f"Lỗi hệ thống: {str(e)}"}
-
+        error_msg = str(e)
+        print(f"\n=== LỖI HỆ THỐNG: {error_msg} ===\n", flush=True)
+        
+        # --- BẮT LỖI 429 THÂN THIỆN ---
+        if "429" in error_msg or "quota" in error_msg.lower():
+            return {"level": "Safe", "reply": "Mình đang có hơi nhiều bạn cùng tâm sự nên bị quá tải một chút. Bạn cho mình nghỉ ngơi 1 phút rồi nhắn lại nhé! 💙"}
+        
+        # Bắt các lỗi mạng/hệ thống khác
+        return {"level": "Error", "reply": f"Lỗi hệ thống: {error_msg}"}
 # ==========================================
 # CÁC ROUTE CỦA GIAO DIỆN WEB
 # ==========================================
