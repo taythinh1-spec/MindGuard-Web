@@ -51,8 +51,9 @@ def get_ai_response(user_input):
         raw_text = response.text.strip()
         clean_json = raw_text.replace('```json', '').replace('```', '').strip()
         return json.loads(clean_json)
-    except Exception as e:
-        return {"Level": "Error", "reply": "Hệ thống đang bận, mình sẽ quay lại ngay!"}
+   except Exception as e:
+            # Tạm thời in thẳng lỗi e ra màn hình web để chúng ta cùng xem
+            return {"level": "Error", "reply": f"Lỗi AI thực sự là: {str(e)}"}
 
 @app.route('/')
 def home():
