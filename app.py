@@ -11,7 +11,7 @@ app = Flask(__name__)
 # ==========================================
 # GIỮ NGUYÊN 100% THÔNG TIN API KEYS TỪ ẢNH CỦA BẠN
 # ==========================================
-GEMINI_API_KEY = "AIzaSyBinPs722p7ihGJ7xy2mV1vOTv-ldzXrak"
+GEMINI_API_KEY = "AIzaSyCXVwGrA-6BQdNQOnEu_GccHELAoNhrES4"
 TELEGRAM_TOKEN = "7061902150:AAFnEcywGZc-z6inJKgQX6bCIpk5ngFc"
 TELEGRAM_CHAT_ID = "5871331291"
 
