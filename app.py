@@ -9,9 +9,10 @@ import google.generativeai as genai
 app = Flask(__name__)
 
 # ==========================================
-# CẤU HÌNH API KEYS (Đã bảo mật theo biến môi trường)
+# CẤU HÌNH API KEYS VÀ THÔNG TIN BẢO MẬT
 # ==========================================
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+# Lấy API Key an toàn từ biến môi trường của Render
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") 
 TELEGRAM_TOKEN = "7061902150:AAFmEcywGZc-z6inJKgQX6bCIpkSngFc"
 TELEGRAM_CHAT_ID = "5871331291"
 
@@ -32,7 +33,7 @@ model = genai.GenerativeModel(chosen_model)
 print(f"🧠 MINDGUARD ĐÃ KẾT NỐI VỚI MODEL: {chosen_model}")
 
 # ==========================================
-# HÀM GỬI CẢNH BÁO TELEGRAM (DANGER)
+# HÀM GỬI CẢNH BÁO TELEGRAM (KHI GẶP DANGER)
 # ==========================================
 def send_alert(msg, reply):
     text = f"🚨 CẢNH BÁO MỨC ĐỘ NGUY HIỂM! \nHọc sinh: {msg}\nBot: {reply}"
@@ -43,7 +44,7 @@ def send_alert(msg, reply):
         pass
 
 # ==========================================
-# HÀM XỬ LÝ LÕI AI GEMINI (ĐÃ THÊM MÀNG LỌC & BÁO LỖI THÂN THIỆN)
+# HÀM XỬ LÝ LÕI AI GEMINI (CHỐNG LỖI JSON & QUOTA)
 # ==========================================
 def get_ai_response(user_input):
     prompt = f"""Bạn là chuyên gia tâm lý MindGuard AI. Hãy phản hồi: '{user_input}'.
@@ -73,14 +74,15 @@ def get_ai_response(user_input):
         error_msg = str(e)
         print(f"\n=== LỖI HỆ THỐNG: {error_msg} ===\n", flush=True)
         
-        # --- BẮT LỖI 429 THÂN THIỆN ---
+        # Bắt lỗi 429 thân thiện (Hết quota / Quá tải)
         if "429" in error_msg or "quota" in error_msg.lower():
-            return {"level": "Safe", "reply": "Mình đang có hơi nhiều bạn cùng tâm sự nên bị quá tải một chút. Bạn cho mình nghỉ ngơi 1 phút rồi nhắn lại nhé! 💙"}
+            return {"level": "Safe", "reply": "Mình đang có hơi nhiều bạn cùng tâm sự nên bị quá tải một chút. Bạn cho mình nghỉ ngơi khoảng 1 phút rồi nhắn lại nhé! 💙"}
         
-        # Bắt các lỗi mạng/hệ thống khác
+        # Bắt các lỗi hệ thống/mạng khác
         return {"level": "Error", "reply": f"Lỗi hệ thống: {error_msg}"}
+
 # ==========================================
-# CÁC ROUTE CỦA GIAO DIỆN WEB
+# CÁC ROUTE GIAO DIỆN WEB
 # ==========================================
 @app.route('/')
 def home():
@@ -93,7 +95,7 @@ def chat():
     image_base64 = data_req.get('image', '')
     user_name = data_req.get('user_name', 'Học sinh')
     
-    # 1. Xử lý ảnh nếu có
+    # 1. Xử lý ảnh nếu người dùng gửi lên
     if image_base64:
         try:
             img_data = image_base64.split(',')[1]
@@ -110,13 +112,14 @@ def chat():
         except Exception as e:
             print("Lỗi gửi ảnh lên Telegram:", e)
             
-    # 2. Xử lý logic tin nhắn
+    # 2. Xử lý logic nếu chỉ có ảnh mà không có text
     if not user_msg.strip() and image_base64:
         return jsonify({"level": "Safe", "reply": "Mình đã nhận được bức ảnh của bạn rồi nhé! Bức ảnh này có ý nghĩa gì với bạn thế?"})
         
+    # 3. Lấy phản hồi từ AI
     data = get_ai_response(user_msg)
     
-    # 3. Kích hoạt cảnh báo Telegram nếu gặp Danger
+    # 4. Kích hoạt cảnh báo Telegram nếu AI đánh giá mức độ Danger
     if data.get('level') == 'Danger':
         send_alert(user_msg, data.get('reply'))
         
