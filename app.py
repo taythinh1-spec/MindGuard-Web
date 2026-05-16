@@ -1,18 +1,17 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from flask import Flask, render_template, request, jsonify
 import google.generativeai as genai
 import json
 import traceback
 import requests
 import base64  # Thêm thư viện này để xử lý ảnh mã hóa từ giao diện web
-import os
 
 app = Flask(__name__)
 
 # ==========================================
 # GIỮ NGUYÊN 100% THÔNG TIN API KEYS TỪ ẢNH CỦA BẠN
 # ==========================================
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_API_KEY = "AIzaSyBinPs722p7ihGJ7xy2mV1vOTv-ldzXrak"
 TELEGRAM_TOKEN = "7061902150:AAFnEcywGZc-z6inJKgQX6bCIpk5ngFc"
 TELEGRAM_CHAT_ID = "5871331291"
 
@@ -40,30 +39,20 @@ def send_alert(msg, reply):
         pass
 
 def get_ai_response(user_input):
-   import json # Đảm bảo bạn đã có dòng import json ở đầu file, nếu có rồi thì bỏ qua
-
-def get_ai_response(user_input):
-    prompt = f"""Bạn là chuyên gia tâm lý MindGuard AI. Hãy phản hồi: '{user_input}'.
-    Yêu cầu trả về duy nhất định dạng JSON:
-    {{"level": "Safe/Warning/Danger", "reply": "nội dung"}}"""
-    
+    """Giữ nguyên hàm bóc tách dữ liệu AI Gemini của bạn"""
+    prompt = (
+        f"Bạn là chuyên gia tâm lý MindGuard AI. Hãy phản hồi: '{user_input}'. "
+        "Yêu cầu trả về duy nhất định dạng JSON: "
+        '{"Level": "Safe/Warning/Danger", "reply": "Nội dung"}'
+    )
     try:
         response = model.generate_content(prompt)
         raw_text = response.text.strip()
-        
-        # --- PHẦN MỚI: In ra log máy chủ để xem AI trả về cái gì ---
-        print("\n=== AI TRẢ VỀ GỐC ===", flush=True)
-        print(raw_text, flush=True) 
-        print("=====================\n", flush=True)
-        # ---------------------------------------------------------
-        
         clean_json = raw_text.replace('```json', '').replace('```', '').strip()
         return json.loads(clean_json)
-        
     except Exception as e:
-        # --- PHẦN MỚI: In lỗi ra log và hiện thẳng lên web ---
-        print(f"\n=== LỖI PYTHON: {str(e)} ===\n", flush=True) 
-        return {"level": "Error", "reply": f"LỖI CHI TIẾT: {str(e)}"}
+        return {"Level": "Error", "reply": "Hệ thống đang bận, mình sẽ quay lại ngay!"}
+
 @app.route('/')
 def home():
     return render_template('index.html')
