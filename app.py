@@ -44,7 +44,7 @@ def send_alert(msg, reply):
         pass
 
 # ==========================================
-# HÀM XỬ LÝ LÕI AI GEMINI (CHỐNG LỖI JSON & QUOTA)
+# HÀM XỬ LÝ LÕI AI GEMINI (CÓ LƯỚI AN TOÀN)
 # ==========================================
 def get_ai_response(user_input):
     prompt = f"""Bạn là chuyên gia tâm lý MindGuard AI. Hãy phản hồi: '{user_input}'.
@@ -68,18 +68,28 @@ def get_ai_response(user_input):
             clean_json_str = raw_text[start_idx:end_idx+1]
             return json.loads(clean_json_str)
         else:
-            return {"level": "Error", "reply": f"Lỗi định dạng AI: {raw_text}"}
+            # Ép nhảy xuống except nếu AI trả về linh tinh không phải JSON
+            raise Exception("Lỗi định dạng JSON từ AI") 
             
     except Exception as e:
         error_msg = str(e)
         print(f"\n=== LỖI HỆ THỐNG: {error_msg} ===\n", flush=True)
         
-        # Bắt lỗi 429 thân thiện (Hết quota / Quá tải)
+        # --- 🚨 LƯỚI AN TOÀN DỰ PHÒNG (EMERGENCY FALLBACK) 🚨 ---
+        # Quét từ khóa nguy hiểm để cứu vãn tình hình ngay cả khi máy chủ AI Google bị sập/quá tải
+        danger_keywords = ["tự tử", "chết", "tự sát", "không muốn sống", "tuyệt vọng", "kết thúc"]
+        if any(word in user_input.lower() for word in danger_keywords):
+            return {
+                "level": "Danger", 
+                "reply": "Mình nhận thấy bạn đang có suy nghĩ rất tiêu cực. Dù hệ thống chat đang gặp chút sự cố quá tải, nhưng mình đã lập tức gửi tín hiệu khẩn cấp đến thầy cô/chuyên gia tâm lý. Xin bạn hãy bình tĩnh, sẽ có người liên hệ hỗ trợ bạn ngay!"
+            }
+        
+        # Bắt lỗi 429 thân thiện (Hết quota / Quá tải) khi không có từ khóa nguy hiểm
         if "429" in error_msg or "quota" in error_msg.lower():
             return {"level": "Safe", "reply": "Mình đang có hơi nhiều bạn cùng tâm sự nên bị quá tải một chút. Bạn cho mình nghỉ ngơi khoảng 1 phút rồi nhắn lại nhé! 💙"}
         
         # Bắt các lỗi hệ thống/mạng khác
-        return {"level": "Error", "reply": f"Lỗi hệ thống: {error_msg}"}
+        return {"level": "Error", "reply": f"Hệ thống đang bảo trì hoặc gặp sự cố. Bạn quay lại sau ít phút nhé!"}
 
 # ==========================================
 # CÁC ROUTE GIAO DIỆN WEB
@@ -119,7 +129,7 @@ def chat():
     # 3. Lấy phản hồi từ AI
     data = get_ai_response(user_msg)
     
-    # 4. Kích hoạt cảnh báo Telegram nếu AI đánh giá mức độ Danger
+    # 4. Kích hoạt cảnh báo Telegram nếu AI hoặc Lưới an toàn đánh giá mức độ là Danger
     if data.get('level') == 'Danger':
         send_alert(user_msg, data.get('reply'))
         
