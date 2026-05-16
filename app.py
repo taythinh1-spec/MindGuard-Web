@@ -40,21 +40,30 @@ def send_alert(msg, reply):
         pass
 
 def get_ai_response(user_input):
-    """Giữ nguyên hàm bóc tách dữ liệu AI Gemini của bạn"""
-    prompt = (
-        f"Bạn là chuyên gia tâm lý MindGuard AI. Hãy phản hồi: '{user_input}'. "
-        "Yêu cầu trả về duy nhất định dạng JSON: "
-        '{"Level": "Safe/Warning/Danger", "reply": "Nội dung"}'
-    )
+   import json # Đảm bảo bạn đã có dòng import json ở đầu file, nếu có rồi thì bỏ qua
+
+def get_ai_response(user_input):
+    prompt = f"""Bạn là chuyên gia tâm lý MindGuard AI. Hãy phản hồi: '{user_input}'.
+    Yêu cầu trả về duy nhất định dạng JSON:
+    {{"level": "Safe/Warning/Danger", "reply": "nội dung"}}"""
+    
     try:
         response = model.generate_content(prompt)
         raw_text = response.text.strip()
+        
+        # --- PHẦN MỚI: In ra log máy chủ để xem AI trả về cái gì ---
+        print("\n=== AI TRẢ VỀ GỐC ===", flush=True)
+        print(raw_text, flush=True) 
+        print("=====================\n", flush=True)
+        # ---------------------------------------------------------
+        
         clean_json = raw_text.replace('```json', '').replace('```', '').strip()
         return json.loads(clean_json)
-   except Exception as e:
-            # Tạm thời in thẳng lỗi e ra màn hình web để chúng ta cùng xem
-            return {"level": "Error", "reply": f"Lỗi AI thực sự là: {str(e)}"}
-
+        
+    except Exception as e:
+        # --- PHẦN MỚI: In lỗi ra log và hiện thẳng lên web ---
+        print(f"\n=== LỖI PYTHON: {str(e)} ===\n", flush=True) 
+        return {"level": "Error", "reply": f"LỖI CHI TIẾT: {str(e)}"}
 @app.route('/')
 def home():
     return render_template('index.html')
