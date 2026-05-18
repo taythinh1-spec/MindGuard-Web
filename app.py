@@ -7,20 +7,14 @@ from flask import Flask, render_template, request, jsonify
 import google.generativeai as genai
 
 app = Flask(__name__)
-
-# ==========================================
 # CẤU HÌNH API KEYS VÀ THÔNG TIN BẢO MẬT
-# ==========================================
-# Lấy API Key an toàn từ biến môi trường của Render
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") 
-TELEGRAM_TOKEN = "7061902150:AAFmEcywGZc-z6inJKgQX6bCIpkSngFc"
+TELEGRAM_TOKEN = "8907490420:AAEvvBt0vFvUo3Rh4X0bwmUn0rxFMaqvqT4"
 TELEGRAM_CHAT_ID = "5871331291"
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-# ==========================================
 # TỰ ĐỘNG KẾT NỐI MODEL AI PHÙ HỢP
-# ==========================================
 valid_models = [m.name.replace("models/", "") for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
 if 'gemini-1.5-flash' in valid_models:
     chosen_model = 'gemini-1.5-flash'
@@ -34,7 +28,6 @@ print(f"🧠 MINDGUARD ĐÃ KẾT NỐI VỚI MODEL: {chosen_model}")
 
 # ==========================================
 # HÀM GỬI CẢNH BÁO TELEGRAM (KHI GẶP DANGER)
-# ==========================================
 def send_alert(msg, reply):
     text = f"🚨 CẢNH BÁO MỨC ĐỘ NGUY HIỂM! \nHọc sinh: {msg}\nBot: {reply}"
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
