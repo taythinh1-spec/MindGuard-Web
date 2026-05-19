@@ -3,53 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindGuard AI - Hệ Thống Hỗ Trợ Tâm Lý Học Đường</title>
+    <title>MindGuard AI - Tâm Sự Học Đường</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2, h3 { color: #1e3d59; margin-top: 0; }
-        input[type="text"] { width: calc(100% - 20px); padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-        button { width: 100%; padding: 12px; background-color: #17b978; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        button:hover { background-color: #139a63; }
-        .chat-box { height: 300px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; overflow-y: auto; background: #f9f9f9; margin-bottom: 10px; }
-        .msg { margin-bottom: 12px; padding: 8px 12px; border-radius: 8px; max-width: 80%; word-wrap: break-word; font-size: 14px; }
-        .user-msg { background-color: #007bff; color: white; margin-left: auto; text-align: right; }
-        .bot-msg { background-color: #e2e8f0; color: #333; margin-right: auto; }
-        .system-btn { background-color: #007bff; }
-        .system-btn:hover { background-color: #0056b3; }
+        /* Khung chat chính */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #e9ecef; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .chat-container { width: 100%; max-width: 500px; height: 90vh; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+        .chat-header { background: #007bff; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; position: relative; }
+        
+        /* Nút gọi Form Khai báo */
+        .btn-khaibao { position: absolute; right: 15px; top: 12px; background: white; color: #007bff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .btn-khaibao:hover { background: #f0f0f0; }
+
+        .chat-box { flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa; }
+        .msg { margin-bottom: 15px; padding: 10px 15px; border-radius: 15px; max-width: 75%; word-wrap: break-word; font-size: 15px; line-height: 1.4; }
+        .user-msg { background-color: #007bff; color: white; margin-left: auto; border-bottom-right-radius: 2px; }
+        .bot-msg { background-color: #e4e6eb; color: black; margin-right: auto; border-bottom-left-radius: 2px; }
+        
+        .chat-input-area { display: flex; padding: 10px; background: white; border-top: 1px solid #ddd; }
+        .chat-input-area input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 20px; outline: none; font-size: 14px; }
+        .chat-input-area button { margin-left: 10px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
+
+        /* Giao diện Popup (Cửa sổ nổi) */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-content h3 { margin-top: 0; color: #333; }
+        .modal-content input { width: 90%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px; }
+        .modal-btn { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .modal-btn-close { width: 100%; padding: 10px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h3>📝 Bước 1: Khai báo thông tin học sinh</h3>
-        <input type="text" id="regCode" placeholder="Nhập Mã học sinh tự chọn (Ví dụ: HS99)">
-        <input type="text" id="regName" placeholder="Nhập Họ và Tên học sinh (Ví dụ: Nguyễn Văn A)">
-        <input type="text" id="regParent" placeholder="Nhập ID Telegram của Phụ huynh (Lấy từ @userinfobot)">
-        <button class="system-btn" onclick="dangKyThongTin()">Lưu Vào Hệ Thống</button>
-    </div>
-
-    <div class="container">
-        <h2>🧠 Bước 2: Phòng chat MindGuard AI</h2>
-        <input type="text" id="chatCode" placeholder="Nhập lại Mã học sinh của bạn để hệ thống nhận diện...">
-        
-        <div class="chat-box" id="chatBox">
-            <div class="msg bot-msg">Chào bạn, mình là MindGuard. Hôm nay bạn có tâm sự gì muốn chia sẻ cùng mình không? 💙</div>
+    <div class="chat-container">
+        <div class="chat-header">
+            MindGuard AI
+            <button class="btn-khaibao" onclick="moPopup()">📝 Báo danh</button>
         </div>
         
-        <input type="text" id="userMessage" placeholder="Nhập tin nhắn tâm sự ở đây..." onkeypress="if(event.key === 'Enter') guiTinNhan()">
-        <button onclick="guiTinNhan()">Gửi Tin Nhắn</button>
+        <div class="chat-box" id="chatBox">
+            <div class="msg bot-msg">Chào bạn, mình là MindGuard. Mình ở đây để lắng nghe mọi tâm sự của bạn. Hôm nay bạn ổn chứ? 💙</div>
+        </div>
+        
+        <div class="chat-input-area">
+            <input type="text" id="userMessage" placeholder="Nhập tin nhắn..." onkeypress="if(event.key === 'Enter') guiTinNhan()">
+            <button onclick="guiTinNhan()">Gửi</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="regModal">
+        <div class="modal-content">
+            <h3>Khai Báo Thông Tin</h3>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Dành cho học sinh muốn kết nối cảnh báo tới phụ huynh</p>
+            
+            <input type="text" id="regCode" placeholder="Mã học sinh (VD: HS01)">
+            <input type="text" id="regName" placeholder="Họ và tên (VD: Nguyễn Văn A)">
+            <input type="text" id="regParent" placeholder="ID Telegram Phụ Huynh">
+            
+            <button class="modal-btn" onclick="dangKyThongTin()">Lưu Thông Tin</button>
+            <button class="modal-btn-close" onclick="dongPopup()">Đóng</button>
+        </div>
     </div>
 
     <script>
-        // Hàm gửi dữ liệu đăng ký lên máy chủ
+        // Biến lưu mã học sinh ngầm (Mặc định là Khách)
+        let currentStudentCode = "Khách";
+
+        // Mở / Đóng Popup
+        function moPopup() {
+            document.getElementById("regModal").style.display = "flex";
+        }
+        function dongPopup() {
+            document.getElementById("regModal").style.display = "none";
+        }
+
+        // Đăng ký thông tin
         function dangKyThongTin() {
-            let code = document.getElementById("regCode").value;
-            let name = document.getElementById("regName").value;
-            let parent = document.getElementById("regParent").value;
+            let code = document.getElementById("regCode").value.trim();
+            let name = document.getElementById("regName").value.trim();
+            let parent = document.getElementById("regParent").value.trim();
 
             if(!code || !name || !parent) {
-                alert("Vui lòng nhập đầy đủ thông tin trước khi lưu!");
+                alert("Vui lòng nhập đầy đủ thông tin!");
                 return;
             }
 
@@ -61,8 +95,9 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === "success") {
-                    alert("Chúc mừng! Hệ thống đã ghi nhận thông tin tự động. Bây giờ bạn có thể dùng Mã này để chat ở ô phía dưới.");
-                    document.getElementById("chatCode").value = code; // Tự động điền mã xuống ô chat cho tiện
+                    alert("Ghi nhận thành công!");
+                    currentStudentCode = code; // Ghi nhớ mã học sinh vào biến ngầm
+                    dongPopup(); // Tự động giấu Form đi
                 } else {
                     alert("Lỗi: " + data.message);
                 }
@@ -70,40 +105,32 @@
             .catch(err => alert("Không kết nối được server: " + err));
         }
 
-        // Hàm xử lý gửi tin nhắn chat
+        // Gửi tin nhắn
         function guiTinNhan() {
             let messageInput = document.getElementById("userMessage");
-            let codeInput = document.getElementById("chatCode");
             let chatBox = document.getElementById("chatBox");
-
             let message = messageInput.value.trim();
-            let studentCode = codeInput.value.trim();
 
             if (!message) return;
-            if (!studentCode) {
-                alert("Vui lòng điền Mã học sinh ở ô phía trên để bot nhận diện nhé!");
-                return;
-            }
 
-            // Hiển thị tin nhắn của học sinh lên màn hình chat
+            // Hiển thị tin nhắn người dùng
             chatBox.innerHTML += `<div class="msg user-msg">${message}</div>`;
             messageInput.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // Gửi yêu cầu chat lên máy chủ Flask
+            // Gửi dữ liệu kèm mã học sinh (nếu đã khai báo thì nó gửi mã, chưa khai báo nó gửi chữ "Khách")
             fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message, student_code: studentCode })
+                body: JSON.stringify({ message: message, student_code: currentStudentCode })
             })
             .then(res => res.json())
             .then(data => {
-                // Hiển thị câu trả lời từ Bot lên màn hình chat
                 chatBox.innerHTML += `<div class="msg bot-msg">${data.reply}</div>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
             })
             .catch(err => {
-                chatBox.innerHTML += `<div class="msg bot-msg" style="color:red;">Hệ thống đang bận hoặc gặp sự cố kết nối. Thử lại sau ít giây!</div>`;
+                chatBox.innerHTML += `<div class="msg bot-msg" style="color:red;">Lỗi kết nối. Thử lại sau nhé!</div>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
             });
         }
