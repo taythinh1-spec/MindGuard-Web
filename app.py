@@ -6,6 +6,7 @@ import traceback
 from flask import Flask, render_template, request, jsonify
 import google.generativeai as genai
 from flask import request
+import requests
 
 app = Flask(__name__)
 # CẤU HÌNH API KEYS VÀ THÔNG TIN BẢO MẬT
@@ -128,20 +129,49 @@ def chat():
         send_alert(user_msg, data.get('reply'))
         
     return jsonify(data)
-@app.route('/webhook', methods=['GET'])
-def verify_webhook():
-    # Đây là mật khẩu tự tạo, bạn cứ để nguyên thế này
-    VERIFY_TOKEN = "MINDGUARD_123"
+@app.route('/webhook', methods=['GET', 'POST'])
+def webhook():
+    # --- PHẦN 1: XÁC MINH META (GET) ---
+    if request.method == 'GET':
+        VERIFY_TOKEN = "MINDGUARD_123"
+        mode = request.args.get('hub.mode')
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+        if mode == 'subscribe' and token == VERIFY_TOKEN:
+            return challenge, 200
+        return "Webhook đang hoạt động", 200
+        
+    # --- PHẦN 2: NHẬN TIN NHẮN TỪ NGƯỜI DÙNG (POST) ---
+    elif request.method == 'POST':
+        data = request.get_json()
+        if data['object'] == 'page':
+            for entry in data['entry']:
+                for messaging_event in entry.get('messaging', []):
+                    # Nếu có tin nhắn văn bản gửi tới
+                    if messaging_event.get('message') and messaging_event['message'].get('text'):
+                        sender_id = messaging_event['sender']['id']
+                        user_message = messaging_event['message']['text']
+                        
+                        print(f"Người dùng vừa nhắn: {user_message}")
+                        
+                        # Tạm thời cấu hình để Bot nhại lại tin nhắn (Test kết nối)
+                        # (Sau khi test thành công, bạn sẽ ghép code gọi AI MindGuard vào đây)
+                        bot_reply = f"MindGuard đã nhận được tin nhắn của bạn: {user_message}"
+                        
+                        # Lệnh gửi tin nhắn đi
+                        send_message(sender_id, bot_reply)
+                        
+        return "EVENT_RECEIVED", 200
+        def send_message(recipient_id, text):
+    # DÁN ĐOẠN MÃ TRUY CẬP (TOKEN) DÀI NGOẰNG CỦA BẠN VÀO GIỮA 2 DẤU NGOẶC KÉP NÀY:
+    PAGE_ACCESS_TOKEN = "ĐIỀN_MÃ_CỦA_BẠN_VÀO_ĐÂY" 
     
-    mode = request.args.get('hub.mode')
-    token = request.args.get('hub.verify_token')
-    challenge = request.args.get('hub.challenge')
-
-    # Nếu Meta gõ cửa và đọc đúng mật khẩu
-    if mode == 'subscribe' and token == VERIFY_TOKEN:
-        print("Đã kết nối thành công với Meta!")
-        return challenge, 200
-    
-    return "Webhook đang hoạt động", 200
+    url = f"https://graph.facebook.com/v19.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
+    payload = {
+        "recipient": {"id": recipient_id},
+        "message": {"text": text}
+    }
+    headers = {"Content-Type": "application/json"}
+    requests.post(url, json=payload, headers=headers)
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
