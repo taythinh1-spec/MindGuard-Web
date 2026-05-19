@@ -5,6 +5,7 @@ import requests
 import traceback
 from flask import Flask, render_template, request, jsonify
 import google.generativeai as genai
+from flask import request
 
 app = Flask(__name__)
 # CẤU HÌNH API KEYS VÀ THÔNG TIN BẢO MẬT
@@ -127,6 +128,20 @@ def chat():
         send_alert(user_msg, data.get('reply'))
         
     return jsonify(data)
+@app.route('/webhook', methods=['GET'])
+def verify_webhook():
+    # Đây là mật khẩu tự tạo, bạn cứ để nguyên thế này
+    VERIFY_TOKEN = "MINDGUARD_123"
+    
+    mode = request.args.get('hub.mode')
+    token = request.args.get('hub.verify_token')
+    challenge = request.args.get('hub.challenge')
 
+    # Nếu Meta gõ cửa và đọc đúng mật khẩu
+    if mode == 'subscribe' and token == VERIFY_TOKEN:
+        print("Đã kết nối thành công với Meta!")
+        return challenge, 200
+    
+    return "Webhook đang hoạt động", 200
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
