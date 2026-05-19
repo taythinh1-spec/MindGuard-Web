@@ -152,20 +152,16 @@ def webhook():
                         sender_id = messaging_event['sender']['id']
                         user_message = messaging_event['message']['text']
                         
-                        print(f"Người dùng vừa nhắn: {user_message}")
+                        bot_reply = f"MindGuard đã nhận được tin nhắn của bạn: {user_message}"
                         
-                       bot_reply = f"MindGuard đã nhận được tin nhắn của bạn: {user_message}"
-
                         # Lệnh gửi tin nhắn đi
                         send_message(sender_id, bot_reply)
-
-            # Chú ý thụt lề: Dòng chữ return này nằm ngang hàng với chữ 'for entry in data['entry']:'
+                        
+            # Chú ý: return ngang hàng với chữ for đầu tiên
             return "EVENT_RECEIVED", 200
-
-        # Nếu không phải tin nhắn từ page thì trả về 404
+            
         return "NOT_FOUND", 404
                         
-        return "EVENT_RECEIVED", 200
 def send_message(recipient_id, text):
     PAGE_ACCESS_TOKEN = "EAAbvCpv0bvUBReC2MczQ1Cc8qEZA3Fmotxe96M0zOqIClEMBQV4reZAU99F8YQ5zgPYi9Gm4vb2fht9qIj1ZASt8P1Q3fl8aKJGTtIqsxbPHVbQXNgF1SF7sXmZAlM7ZAudBxwGeT3wrrZBvDKsDLIW1wMf6TZCGL3Bn5YNfLViPEaCPR6Lmq7Te6YV9KZB9Dnl1M07r"
     
