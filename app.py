@@ -164,7 +164,7 @@ def webhook():
         return "EVENT_RECEIVED", 200
         def send_message(recipient_id, text):
     # DÁN ĐOẠN MÃ TRUY CẬP (TOKEN) DÀI NGOẰNG CỦA BẠN VÀO GIỮA 2 DẤU NGOẶC KÉP NÀY:
-    PAGE_ACCESS_TOKEN = "ĐIỀN_MÃ_CỦA_BẠN_VÀO_ĐÂY" 
+    PAGE_ACCESS_TOKEN = "EAAbvCpv0bvUBReC2MczQ1Cc8qEZA3Fmotxe96M0zOqIClEMBQV4reZAU99F8YQ5zgPYi9Gm4vb2fht9qIj1ZASt8P1Q3fl8aKJGTtIqsxbPHVbQXNgF1SF7sXmZAlM7ZAudBxwGeT3wrrZBvDKsDLIW1wMf6TZCGL3Bn5YNfLViPEaCPR6Lmq7Te6YV9KZB9Dnl1M07r" 
     
     url = f"https://graph.facebook.com/v19.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
     payload = {
