@@ -13,37 +13,59 @@ app = Flask(__name__)
 # ==========================================
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") 
 TELEGRAM_TOKEN = "8561921353:AAF8mzyV6ZEIe-x3eiwJEgQX90C1pKSngFc"
-TELEGRAM_CHAT_ID = "5871531291" 
+TEACHER_CHAT_ID = "5871531291"
 
 genai.configure(api_key=GEMINI_API_KEY)
 
 # ==========================================
+# CƠ SỞ DỮ LIỆU TỰ ĐỘNG BẰNG FILE JSON
+# ==========================================
+DB_FILE = 'students.json'
+
+def load_db():
+    if os.path.exists(DB_FILE):
+        try:
+            with open(DB_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_db(data):
+    with open(DB_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+# ==========================================
 # TỰ ĐỘNG KẾT NỐI MODEL AI PHÙ HỢP
 # ==========================================
-valid_models = [m.name.replace("models/", "") for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-if 'gemini-1.5-flash' in valid_models:
+try:
+    valid_models = [m.name.replace("models/", "") for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+    if 'gemini-1.5-flash' in valid_models:
+        chosen_model = 'gemini-1.5-flash'
+    elif 'gemini-pro' in valid_models:
+        chosen_model = 'gemini-pro'
+    else:
+        chosen_model = valid_models[0]
+except:
     chosen_model = 'gemini-1.5-flash'
-elif 'gemini-pro' in valid_models:
-    chosen_model = 'gemini-pro'
-else:
-    chosen_model = valid_models[0]
 
 model = genai.GenerativeModel(chosen_model)
 print(f"🧠 MINDGUARD ĐÃ KẾT NỐI VỚI MODEL: {chosen_model}")
 
 # ==========================================
-# HÀM GỬI CẢNH BÁO TELEGRAM
+# HÀM GỬI CẢNH BÁO TELEGRAM (ĐỊNH TUYẾN KÉP)
 # ==========================================
-def send_alert(msg, reply):
-    text = f"🚨 CẢNH BÁO MỨC ĐỘ NGUY HIỂM! \nHọc sinh: {msg}\nBot: {reply}"
+def send_alert(msg, reply, chat_id, role, student_code, student_name):
+    text = f"🚨 MINDGUARD CẢNH BÁO ({role}) 🚨\n"
+    text += f"👤 Học sinh: {student_name} (Mã: {student_code})\n"
+    text += f"💬 Tin nhắn: {msg}\n"
+    text += f"🤖 Bot phản hồi: {reply}"
+    
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     try:
-        response = requests.post(url, json={"chat_id": TELEGRAM_CHAT_ID, "text": text}, timeout=5)
-        print("\n=== KẾT QUẢ GỬI TELEGRAM ===", flush=True)
-        print(response.json(), flush=True)
-        print("============================\n", flush=True)
+        requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=5)
     except Exception as e:
-        print(f"\n=== LỖI KẾT NỐI TELEGRAM: {e} ===\n", flush=True)
+        print(f"Lỗi gửi Telegram ({role}): {e}", flush=True)
 
 # ==========================================
 # HÀM XỬ LÝ LÕI AI GEMINI (CÓ LƯỚI AN TOÀN)
@@ -57,10 +79,6 @@ def get_ai_response(user_input):
         response = model.generate_content(prompt)
         raw_text = response.text.strip()
         
-        print("\n=== AI TRẢ VỀ GỐC ===", flush=True)
-        print(raw_text, flush=True) 
-        print("=====================\n", flush=True)
-        
         start_idx = raw_text.find('{')
         end_idx = raw_text.rfind('}')
         
@@ -68,82 +86,84 @@ def get_ai_response(user_input):
             clean_json_str = raw_text[start_idx:end_idx+1]
             return json.loads(clean_json_str)
         else:
-            raise Exception("Lỗi định dạng JSON từ AI") 
+            raise Exception("Lỗi định dạng JSON") 
             
     except Exception as e:
         error_msg = str(e)
-        print(f"\n=== LỖI HỆ THỐNG AI: {error_msg} ===\n", flush=True)
-        
-        # --- 🚨 LƯỚI AN TOÀN DỰ PHÒNG 🚨 ---
         danger_keywords = ["tự tử", "chết", "tự sát", "không muốn sống", "tuyệt vọng", "kết thúc"]
         if any(word in user_input.lower() for word in danger_keywords):
             return {
                 "level": "Danger", 
-                "reply": "Mình nhận thấy bạn đang có suy nghĩ rất tiêu cực. Dù hệ thống chat đang gặp chút sự cố, nhưng mình đã lập tức gửi tín hiệu khẩn cấp đến thầy cô. Xin bạn hãy bình tĩnh, sẽ có người liên hệ hỗ trợ bạn ngay!"
+                "reply": "Mình nhận thấy bạn đang có suy nghĩ rất tiêu cực. Mình đã lập tức gửi tín hiệu khẩn cấp đến thầy cô và gia đình. Xin bạn hãy bình tĩnh, sẽ có người hỗ trợ bạn ngay!"
             }
         
         if "429" in error_msg or "quota" in error_msg.lower():
             return {"level": "Safe", "reply": "Mình đang có hơi nhiều bạn cùng tâm sự nên bị quá tải một chút. Bạn cho mình nghỉ ngơi khoảng 1 phút rồi nhắn lại nhé! 💙"}
         
-        return {"level": "Error", "reply": "Hệ thống đang bảo trì hoặc gặp sự cố. Bạn quay lại sau ít phút nhé!"}
+        return {"level": "Error", "reply": "Hệ thống đang bận, bạn đợi mình một xíu nhé!"}
 
 # ==========================================
-# CÁC ROUTE GIAO DIỆN WEB
+# CÁC ROUTE ĐIỀU HƯỚNG
 # ==========================================
 @app.route('/')
 def home():
     return render_template('index.html')
 
+@app.route('/register', methods=['POST'])
+def register():
+    try:
+        data = request.json or {}
+        code = data.get('student_code', '').upper().strip()
+        name = data.get('student_name', '').strip()
+        parent_id = data.get('parent_id', '').strip()
+
+        if not code or not name or not parent_id:
+            return jsonify({"status": "error", "message": "Vui lòng điền đầy đủ tất cả các ô!"}), 400
+
+        db = load_db()
+        db[code] = {
+            "ten": name,
+            "phu_huynh_id": parent_id
+        }
+        save_db(db)
+        return jsonify({"status": "success", "message": "Khai báo thông tin thành công!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
-        data_req = request.json
-        if not data_req:
-            return jsonify({"level": "Error", "reply": "Không nhận được dữ liệu yêu cầu."}), 400
-            
+        data_req = request.json or {}
         user_msg = data_req.get('message', '')
-        image_base64 = data_req.get('image', '')
-        user_name = data_req.get('user_name', 'Học sinh')
+        student_code = data_req.get('student_code', 'Khách').upper().strip()
         
-        # 1. Xử lý ảnh gửi lên Telegram (nếu có)
-        if image_base64:
-            try:
-                img_data = image_base64.split(',')[1]
-                img_bytes = base64.b64decode(img_data)
-                
-                url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendPhoto"
-                caption = f"📸 Ảnh gửi từ: {user_name}"
-                if user_msg:
-                    caption += f"\n💬 Tin nhắn kèm theo: {user_msg}"
-                    
-                files = {'photo': ('image.png', img_bytes)}
-                payload = {'chat_id': TELEGRAM_CHAT_ID, 'caption': caption}
-                requests.post(url, data=payload, files=files, timeout=5)
-            except Exception as e:
-                print("Lỗi gửi ảnh lên Telegram:", e, flush=True)
-                
-        # 2. Xử lý logic nếu chỉ gửi ảnh (không có chữ)
-        if not user_msg.strip() and image_base64:
-            return jsonify({"level": "Safe", "reply": "Mình đã nhận được bức ảnh của bạn rồi nhé! Bức ảnh này có ý nghĩa gì với bạn thế?"})
+        # Đọc dữ liệu từ file JSON tự động
+        db = load_db()
+        student_name = "Học sinh Ẩn danh"
+        parent_id = None
+        
+        if student_code in db:
+            student_name = db[student_code]["ten"]
+            parent_id = db[student_code]["phu_huynh_id"]
             
-        # 3. Lấy phản hồi từ AI / Lưới an toàn
+        # Gọi AI lấy câu trả lời
         data = get_ai_response(user_msg)
-        
-        # Đảm bảo dữ liệu luôn là một Dictionary hợp lệ
         if not data or not isinstance(data, dict):
             data = {"level": "Error", "reply": "Hệ thống đang bận, bạn đợi mình một xíu nhé!"}
         
-        # 4. Kích hoạt cảnh báo Telegram nếu là Danger
+        # Nếu phát hiện mức độ Danger -> Tiến hành kích hoạt báo động kép
         if data.get('level') == 'Danger':
-            send_alert(user_msg, data.get('reply'))
-            
-        # 5. Trả về kết quả cho web
+            # 1. Luôn báo về cho Giáo viên
+            send_alert(user_msg, data.get('reply'), TEACHER_CHAT_ID, "Giáo viên", student_code, student_name)
+            # 2. Nếu tìm thấy ID phụ huynh của học sinh này -> Báo về cho Phụ huynh
+            if parent_id:
+                send_alert(user_msg, data.get('reply'), parent_id, "Phụ huynh", student_code, student_name)
+                
         return jsonify(data)
 
     except Exception as global_err:
-        print(f"\n❌ LỖI HỆ THỐNG TẠI ROUTE CHAT: {global_err} \n", flush=True)
         traceback.print_exc()
-        return jsonify({"level": "Error", "reply": "Hệ thống đang gặp sự cố nhỏ. Bạn thử lại sau vài giây nhé!"})
+        return jsonify({"level": "Error", "reply": "Hệ thống đang gặp sự cố nhỏ. Thử lại sau nhé!"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
