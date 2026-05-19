@@ -12,7 +12,7 @@ app = Flask(__name__)
 # CẤU HÌNH API KEYS VÀ THÔNG TIN BẢO MẬT
 # ==========================================
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-TELEGRAM_TOKEN = "8907490420:AAevvBt0vFvUo3Rh4X0bwmUn0rXFMaqvqT4"
+TELEGRAM_TOKEN = "8561921353:AAF8mzyV6ZEIe-x3eiwJEgQX90C1pKSngF"
 TELEGRAM_CHAT_ID = "5871331291"
 
 # THÔNG TIN XÁC THỰC MESSENGER META
