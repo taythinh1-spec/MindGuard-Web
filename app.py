@@ -144,7 +144,7 @@ def webhook():
     # --- PHẦN 2: NHẬN TIN NHẮN TỪ NGƯỜI DÙNG (POST) ---
     elif request.method == 'POST':
         data = request.get_json()
-        if data['object'] == 'page':
+        if data and data.get('object') == 'page':
             for entry in data['entry']:
                 for messaging_event in entry.get('messaging', []):
                     # Nếu có tin nhắn văn bản gửi tới
@@ -154,17 +154,20 @@ def webhook():
                         
                         print(f"Người dùng vừa nhắn: {user_message}")
                         
-                        # Tạm thời cấu hình để Bot nhại lại tin nhắn (Test kết nối)
-                        # (Sau khi test thành công, bạn sẽ ghép code gọi AI MindGuard vào đây)
-                        bot_reply = f"MindGuard đã nhận được tin nhắn của bạn: {user_message}"
-                        
+                       bot_reply = f"MindGuard đã nhận được tin nhắn của bạn: {user_message}"
+
                         # Lệnh gửi tin nhắn đi
                         send_message(sender_id, bot_reply)
+
+            # Chú ý thụt lề: Dòng chữ return này nằm ngang hàng với chữ 'for entry in data['entry']:'
+            return "EVENT_RECEIVED", 200
+
+        # Nếu không phải tin nhắn từ page thì trả về 404
+        return "NOT_FOUND", 404
                         
         return "EVENT_RECEIVED", 200
         def send_message(recipient_id, text):
-    # DÁN ĐOẠN MÃ TRUY CẬP (TOKEN) DÀI NGOẰNG CỦA BẠN VÀO GIỮA 2 DẤU NGOẶC KÉP NÀY:
-    PAGE_ACCESS_TOKEN = "EAAbvCpv0bvUBReC2MczQ1Cc8qEZA3Fmotxe96M0zOqIClEMBQV4reZAU99F8YQ5zgPYi9Gm4vb2fht9qIj1ZASt8P1Q3fl8aKJGTtIqsxbPHVbQXNgF1SF7sXmZAlM7ZAudBxwGeT3wrrZBvDKsDLIW1wMf6TZCGL3Bn5YNfLViPEaCPR6Lmq7Te6YV9KZB9Dnl1M07r" 
+    PAGE_ACCESS_TOKEN = "EAAbvCpv0bvUBReC2MczQ1Cc8qEZA3Fmotxe96M0zOqIClEMBQV4reZAU99F8YQ5zgPYi9Gm4vb2fht9qIj1ZASt8P1Q3fl8aKJGTtIqsxbPHVbQXNgF1SF7sXmZAlM7ZAudBxwGeT3wrrZBvDKsDLIW1wMf6TZCGL3Bn5YNfLViPEaCPR6Lmq7Te6YV9KZB9Dnl1M07r"
     
     url = f"https://graph.facebook.com/v19.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
     payload = {
@@ -173,5 +176,6 @@ def webhook():
     }
     headers = {"Content-Type": "application/json"}
     requests.post(url, json=payload, headers=headers)
+   
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
