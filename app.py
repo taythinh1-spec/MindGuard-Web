@@ -38,7 +38,13 @@ print(f"🧠 MINDGUARD ĐÃ KẾT NỐI VỚI MODEL: {chosen_model}")
 # HÀM BỔ TRỢ (TELEGRAM & AI)
 # ==========================================
 def send_alert(msg, reply):
-    text = f"🚨 CẢNH BÁO MỨC ĐỘ NGUY HIỂM! \nHọc sinh: {msg}\nBot: {reply}"
+    # Định dạng tin nhắn viết hoa, rõ ràng y như ảnh mẫu của bạn
+    text = (
+        "🚨 CANH BAO MINDGUARD 🚨\n"
+        f"HS: {msg}\n"
+        f"AI: {reply}"
+    )
+    
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     try:
         requests.post(url, json={"chat_id": TELEGRAM_CHAT_ID, "text": text}, timeout=5)
