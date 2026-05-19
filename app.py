@@ -13,7 +13,7 @@ app = Flask(__name__)
 # ==========================================
 # Lấy API Key an toàn từ biến môi trường của Render
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") 
-TELEGRAM_TOKEN = "8561921353:AAF8mzyV6ZEIe-x3eiwJEgQX90C1pKSngFc"
+TELEGRAM_TOKEN = "8907490420:AAEvvBt0vFvUo3Rh4X0bwmUn0rxFMaqvqT4"
 TELEGRAM_CHAT_ID = "5871331291"
 
 genai.configure(api_key=GEMINI_API_KEY)
