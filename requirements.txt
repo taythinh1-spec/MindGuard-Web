@@ -1,5 +1,4 @@
-flask
-gunicorn
-requests
-python-dotenv
-google-genai
+Flask==3.0.2
+google-generativeai==0.8.3
+requests==2.31.0
+gunicorn==21.2.0
