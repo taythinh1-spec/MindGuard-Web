@@ -12,53 +12,26 @@
         
         body { 
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2e1065 100%); 
-            height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 20px;
-            overflow: hidden;
-            position: relative;
+            height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; overflow: hidden; position: relative;
         }
 
-        /* Hiệu ứng bóng sáng chạy ngầm phía sau tạo chiều sâu */
         body::before {
-            content: ""; position: absolute; width: 400px; height: 400px; background: rgba(99, 102, 241, 0.15);
-            filter: blur(100px); border-radius: 50%; top: 10%; left: 10%; z-index: 0;
+            content: ""; position: absolute; width: 400px; height: 400px; background: rgba(99, 102, 241, 0.15); filter: blur(100px); border-radius: 50%; top: 10%; left: 10%; z-index: 0;
         }
         body::after {
-            content: ""; position: absolute; width: 400px; height: 400px; background: rgba(217, 70, 239, 0.1);
-            filter: blur(100px); border-radius: 50%; bottom: 10%; right: 10%; z-index: 0;
+            content: ""; position: absolute; width: 400px; height: 400px; background: rgba(217, 70, 239, 0.1); filter: blur(100px); border-radius: 50%; bottom: 10%; right: 10%; z-index: 0;
         }
 
-        /* KHUNG CHÍNH GLASSMORPHISM */
         .main-container { 
-            display: flex; 
-            width: 1100px; 
-            height: 800px; 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px);
-            border-radius: 24px; 
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
-            overflow: hidden; 
-            position: relative; 
-            z-index: 10;
+            display: flex; width: 1100px; height: 800px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; position: relative; z-index: 10;
         }
 
-        /* MÀN HÌNH NHẬP THÔNG TIN (MODAL) */
         .modal-overlay { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); 
-            display: flex; justify-content: center; align-items: center; z-index: 1000; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); display: flex; justify-content: center; align-items: center; z-index: 1000; 
         }
         .modal-box { 
-            background: rgba(30, 41, 59, 0.8); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px 30px; border-radius: 20px; width: 400px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center; 
-            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); color: white;
+            background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px 30px; border-radius: 20px; width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center; color: white; animation: fadeIn 0.4s ease;
         }
         .modal-box h3 { margin-bottom: 8px; font-size: 22px; font-weight: 700; background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .avatar-upload { margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -71,16 +44,12 @@
         .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
         
         .modal-box input { 
-            width: 100%; padding: 12px 16px; margin-bottom: 15px; 
-            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 10px; outline: none; color: white; font-size: 14px; transition: 0.2s;
+            width: 100%; padding: 12px 16px; margin-bottom: 15px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; outline: none; color: white; font-size: 14px; transition: 0.2s;
         }
-        .modal-box input:focus { border-color: #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.2); background: rgba(15, 23, 42, 0.8); }
+        .modal-box input:focus { border-color: #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.2); }
         .modal-box ::placeholder { color: #64748b; }
         .modal-box .save-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
-        .modal-box .save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        /* SIDEBAR (BÊN TRÁI) */
+        
         .sidebar { width: 300px; background: rgba(15, 23, 42, 0.6); padding: 25px 20px; display: flex; flex-direction: column; gap: 20px; color: white; border-right: 1px solid rgba(255, 255, 255, 0.05); }
         .user-info-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 14px; display: flex; align-items: center; gap: 12px; }
         .sidebar-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid #10b981; flex-shrink: 0; }
@@ -88,24 +57,21 @@
         .user-details { display: flex; flex-direction: column; gap: 2px; }
         .user-details .name { font-weight: 600; font-size: 14px; color: #f8fafc; }
         .user-details .year { font-size: 11px; color: #94a3b8; }
-        .edit-info-btn { font-size: 11px; color: #34d399; background: none; border: none; cursor: pointer; text-decoration: none; text-align: left; margin-top: 2px; font-weight: 500; }
-        .edit-info-btn:hover { color: #10b981; text-decoration: underline; }
+        .edit-info-btn { font-size: 11px; color: #34d399; background: none; border: none; cursor: pointer; text-align: left; margin-top: 2px; }
+        .edit-info-btn:hover { text-decoration: underline; }
         
         .new-chat-btn { background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; text-align: center; transition: 0.2s; }
-        .new-chat-btn:hover { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); border-color: transparent; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
+        .new-chat-btn:hover { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); border-color: transparent; }
         
         .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
-        /* Tùy biến thanh cuộn nhỏ gọn xinh xắn */
         .history-list::-webkit-scrollbar, .chat-box::-webkit-scrollbar { width: 5px; }
         .history-list::-webkit-scrollbar-thumb, .chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         
-        .history-item { padding: 12px 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.02); border-radius: 10px; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; align-items: center; color: #cbd5e1; transition: 0.2s; }
+        .history-item { padding: 12px 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.02); border-radius: 10px; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; align-items: center; color: #cbd5e1; }
         .history-item:hover, .history-item.active { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); color: white; }
-        .delete-history-btn { color: #ef4444; border: none; background: none; cursor: pointer; font-size: 14px; display: none; opacity: 0.7; }
-        .delete-history-btn:hover { opacity: 1; }
+        .delete-history-btn { color: #ef4444; border: none; background: none; cursor: pointer; font-size: 14px; display: none; }
         .history-item:hover .delete-history-btn { display: inline-block; }
 
-        /* KHUNG CHAT (BÊN PHẢI) */
         .chat-container { flex: 1; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.3); }
         .chat-header { background: rgba(15, 23, 42, 0.4); padding: 22px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .chat-header h2 { font-size: 18px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -123,29 +89,24 @@
         .bot-message { background: rgba(255, 255, 255, 0.06); color: #e2e8f0; border-top-left-radius: 4px; border: 1px solid rgba(255,255,255,0.03); }
         .user-wrapper { flex-direction: row-reverse; }
         .user-message { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; border-top-right-radius: 4px; }
-        .message-image { max-width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s; }
-        .message-image:hover { transform: scale(1.01); }
+        .message-image { max-width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* THANH NHẬP LIỆU */
         .input-area { padding: 20px; background: rgba(15, 23, 42, 0.4); display: flex; align-items: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
-        .input-wrapper { flex: 1; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.6); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; transition: 0.2s; }
-        .input-wrapper:focus-within { border-color: #6366f1; box-shadow: 0 0 12px rgba(99, 102, 241, 0.15); }
+        .input-wrapper { flex: 1; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.6); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; }
+        .input-wrapper:focus-within { border-color: #6366f1; }
         
         .image-preview-container { padding: 12px; display: none; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); position: relative; }
         .image-preview-container img { max-height: 110px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-        .remove-preview-btn { position: absolute; top: 6px; left: 112px; background: rgba(239, 68, 68, 0.8); color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
-        .remove-preview-btn:hover { background: #ef4444; }
+        .remove-preview-btn { position: absolute; top: 6px; left: 112px; background: rgba(239, 68, 68, 0.8); color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         
         .input-area input { width: 100%; padding: 14px 20px; border: none; background: transparent; outline: none; font-size: 14px; color: white; }
         .input-area ::placeholder { color: #475569; }
         
-        .attach-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; width: 48px; height: 48px; border-radius: 16px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .attach-btn:hover { color: white; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        .attach-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; width: 48px; height: 48px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .attach-btn:hover { color: white; background: rgba(255,255,255,0.1); }
         
-        .input-area .send-btn { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; width: 48px; height: 48px; border-radius: 16px; cursor: pointer; font-size: 16px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; transition: 0.2s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
-        .input-area .send-btn:hover { opacity: 0.9; transform: scale(1.02); }
+        .input-area .send-btn { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; width: 48px; height: 48px; border-radius: 16px; cursor: pointer; font-size: 16px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
 
-        /* TYPING INDICATOR */
         .typing-indicator { display: flex; gap: 5px; padding: 6px 10px; align-items: center; }
         .typing-indicator span { width: 7px; height: 7px; background: #6366f1; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
@@ -159,13 +120,13 @@
         
         <div id="modal-overlay" class="modal-overlay" style="display: none;">
             <div class="modal-box">
-                <h3>MindGuard xin chào <span style="animation: wave 1.5s infinite; display: inline-block;">👋</span></h3>
+                <h3>MindGuard xin chào 👋</h3>
                 <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">Điền hồ sơ để hệ thống nhận diện bạn nhé!</p>
                 
                 <div class="avatar-upload">
                     <div class="avatar-preview-box"><img id="modal-avatar-preview" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png"></div>
                     <div class="upload-btn-wrapper">
-                        <button><i class="fa-solid fa-camera me-1"></i> Đổi ảnh đại diện</button>
+                        <button><i class="fa-solid fa-camera"></i> Đổi ảnh đại diện</button>
                         <input type="file" id="input-avatar" accept="image/*" onchange="handleProfileImageUpload(event)">
                     </div>
                 </div>
@@ -188,7 +149,7 @@
                     <button class="edit-info-btn" onclick="openModal()"><i class="fa-solid fa-pen-to-square"></i> Sửa hồ sơ</button>
                 </div>
             </div>
-            <button class="new-chat-btn" onclick="startNewChat()"><i class="fa-solid fa-plus me-1"></i> Đoạn chat mới</button>
+            <button class="new-chat-btn" onclick="startNewChat()"><i class="fa-solid fa-plus"></i> Đoạn chat mới</button>
             <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-top: 10px; font-weight: 700;">Gần đây</h3>
             <div class="history-list" id="history-list"></div>
         </div>
@@ -294,10 +255,7 @@
             } 
 
             currentUser = { 
-                name: nameInput, 
-                year: yearInput, 
-                code: codeInput,
-                parent: parentInput,
+                name: nameInput, year: yearInput, code: codeInput, parent: parentInput,
                 avatar: tempProfileAvatarBase64 !== DEFAULT_USER_AVATAR ? tempProfileAvatarBase64 : "" 
             }; 
 
@@ -306,17 +264,18 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ student_code: codeInput, student_name: nameInput, parent_id: parentInput })
             })
+            .then(res => res.json())
             .then(() => {
                 localStorage.setItem('mindguard_user', JSON.stringify(currentUser)); 
                 modalOverlay.style.display = "none"; 
                 updateUserInfoDisplay(); 
                 
-                let allUserAvatars = document.querySelectorAll('.user-avatar img'); 
-                let realAvatar = currentUser.avatar || DEFAULT_USER_AVATAR; 
-                allUserAvatars.forEach(img => img.src = realAvatar); 
-                
                 let sessions = getAllSessions(); 
-                if (Object.keys(sessions).length === 0) startNewChat(); 
+                if (Object.keys(sessions).length === 0) {
+                    startNewChat(); 
+                } else {
+                    renderSidebar();
+                }
             })
             .catch(err => {
                 alert("Lỗi kết nối máy chủ! Vui lòng thử lại.");
@@ -332,15 +291,180 @@
 
         function getAllSessions() { return JSON.parse(localStorage.getItem('mindguard_sessions')) || {}; }
         function saveAllSessions(sessions) { localStorage.setItem('mindguard_sessions', JSON.stringify(sessions)); }
-        
-        // Bạn dán đè hàm renderSidebar() và các hàm xử lý chat cũ của bạn xuống dưới dòng này:
-        function renderSidebar() { 
-            historyList.innerHTML = ""; 
-            let sessions = getAllSessions(); 
-            // [ĐOẠN CODE CŨ TRONG HÀM RENDERSIDEBAR CỦA BẠN...]
+
+        function loadInitialChat() {
+            let sessions = getAllSessions();
+            let sessionIds = Object.keys(sessions);
+            if (sessionIds.length > 0) {
+                selectSession(sessionIds[sessionIds.length - 1]);
+            } else {
+                startNewChat();
+            }
         }
-        
-        // Kích hoạt kiểm tra hồ sơ khi trang web load xong
+
+        function startNewChat() {
+            currentSessionId = "session_" + Date.now();
+            let sessions = getAllSessions();
+            sessions[currentSessionId] = {
+                title: "Đoạn chat mới",
+                messages: [{ sender: "bot", text: `Xin chào ${currentUser.name}, mình là MindGuard. Hôm nay bạn có điều gì muốn tâm sự cùng mình không? 💜`, image: "" }]
+            };
+            saveAllSessions(sessions);
+            selectSession(currentSessionId);
+        }
+
+        function selectSession(sessionId) {
+            currentSessionId = sessionId;
+            renderSidebar();
+            chatBox.innerHTML = "";
+            
+            let sessions = getAllSessions();
+            let currentChat = sessions[currentSessionId];
+            if (currentChat && currentChat.messages) {
+                currentChat.messages.forEach(msg => {
+                    appendMessageToDOM(msg.sender, msg.text, msg.image);
+                });
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function deleteSession(sessionId, event) {
+            event.stopPropagation();
+            if (confirm("Bạn có chắc chắn muốn xóa đoạn hội thoại này?")) {
+                let sessions = getAllSessions();
+                delete sessions[sessionId];
+                saveAllSessions(sessions);
+                loadInitialChat();
+            }
+        }
+
+        function renderSidebar() {
+            historyList.innerHTML = "";
+            let sessions = getAllSessions();
+            Object.keys(sessions).forEach(id => {
+                let item = document.createElement("div");
+                item.className = `history-item ${id === currentSessionId ? 'active' : ''}`;
+                item.onclick = () => selectSession(id);
+                
+                let titleSpan = document.createElement("span");
+                let titleText = sessions[id].title || "Đoạn chat mới";
+                titleSpan.innerText = titleText.length > 18 ? titleText.substring(0, 18) + "..." : titleText;
+                
+                let delBtn = document.createElement("button");
+                delBtn.className = "delete-history-btn";
+                delBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                delBtn.onclick = (e) => deleteSession(id, e);
+                
+                item.appendChild(titleSpan);
+                item.appendChild(delBtn);
+                historyList.appendChild(item);
+            });
+        }
+
+        function appendMessageToDOM(sender, text, imageBase64 = "") {
+            let wrapper = document.createElement("div");
+            wrapper.className = `message-wrapper ${sender === 'user' ? 'user-wrapper' : 'bot-wrapper'}`;
+            
+            let avatarDiv = document.createElement("div");
+            avatarDiv.className = `avatar ${sender === 'user' ? 'user-avatar' : 'bot-avatar'}`;
+            
+            let img = document.createElement("img");
+            img.src = sender === 'user' ? (currentUser.avatar || DEFAULT_USER_AVATAR) : BOT_AVATAR_IMG;
+            avatarDiv.appendChild(img);
+            
+            let msgDiv = document.createElement("div");
+            msgDiv.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+            msgDiv.innerText = text;
+            
+            if (imageBase64) {
+                let msgImg = document.createElement("img");
+                msgImg.className = "message-image";
+                msgImg.src = imageBase64;
+                msgDiv.appendChild(msgImg);
+            }
+            
+            wrapper.appendChild(avatarDiv);
+            wrapper.appendChild(msgDiv);
+            chatBox.appendChild(wrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            let indicator = document.createElement("div");
+            indicator.id = "typing-indicator-box";
+            indicator.className = "message-wrapper bot-wrapper";
+            indicator.innerHTML = `
+                <div class="avatar bot-avatar"><img src="${BOT_AVATAR_IMG}"></div>
+                <div class="message bot-message" style="padding: 10px 15px;">
+                    <div class="typing-indicator"><span></span><span></span><span></span></div>
+                </div>
+            `;
+            chatBox.appendChild(indicator);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            let indicator = document.getElementById("typing-indicator-box");
+            if (indicator) indicator.remove();
+        }
+
+        function sendMessage() {
+            let text = userInput.value.trim();
+            let savedImg = currentChatImageBase64;
+
+            if (!text && !savedImg) return;
+
+            appendMessageToDOM('user', text, savedImg);
+            userInput.value = "";
+            removeChatImagePreview();
+
+            let sessions = getAllSessions();
+            if (sessions[currentSessionId]) {
+                sessions[currentSessionId].messages.push({ sender: "user", text: text, image: savedImg });
+                if (sessions[currentSessionId].title === "Đoạn chat mới" && text) {
+                    sessions[currentSessionId].title = text;
+                }
+                saveAllSessions(sessions);
+                renderSidebar();
+            }
+
+            showTypingIndicator();
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text,
+                    student_code: currentUser.code,
+                    image: savedImg
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                removeTypingIndicator();
+                let botReply = data.reply || "Mình đang lắng nghe bạn đây.";
+                
+                appendMessageToDOM('bot', botReply, "");
+
+                let postSessions = getAllSessions();
+                if (postSessions[currentSessionId]) {
+                    postSessions[currentSessionId].messages.push({ sender: "bot", text: botReply, image: "" });
+                    saveAllSessions(postSessions);
+                }
+            })
+            .catch(err => {
+                removeTypingIndicator();
+                appendMessageToDOM('bot', "Kết nối máy chủ bị gián đoạn. Bạn thử gửi lại tin nhắn nhé! 💙", "");
+                console.error(err);
+            });
+        }
+
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
         window.onload = checkUserInfo;
     </script>
 </body>
