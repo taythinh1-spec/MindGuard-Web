@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindGuard - Trợ lý Tâm lý Pro</title>
+    <title>MindGuard - Trợ lý Tâm lý Pro (Camera Live Scan)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     
@@ -27,6 +27,7 @@
             border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; position: relative; z-index: 10;
         }
 
+        /* BANNER MODAL ĐĂNG KÝ */
         .modal-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); display: flex; justify-content: center; align-items: center; z-index: 1000; 
         }
@@ -50,6 +51,31 @@
         .modal-box ::placeholder { color: #64748b; }
         .modal-box .save-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
         
+        /* POPUP CAMERA WEBCAM */
+        .camera-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(15px); display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .camera-box {
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 25px; width: 450px; text-align: center; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+        }
+        .camera-box h4 { color: white; margin-bottom: 15px; font-size: 18px; font-weight: 600; }
+        .video-container {
+            width: 100%; height: 300px; background: black; border-radius: 16px; overflow: hidden; position: relative; border: 2px solid #6366f1; transform: scaleX(-1); /* Drop mirror effect */
+        }
+        .video-container video { width: 100%; height: 100%; object-fit: cover; }
+        .face-scanner-line {
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(to right, transparent, #34d399, transparent); animation: scanMobile 2s linear infinite; box-shadow: 0 0 12px #34d399; z-index: 5;
+        }
+        @keyframes scanMobile { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+        
+        .camera-controls { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
+        .cam-btn { padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; font-size: 14px; transition: 0.2s; }
+        .snap-btn { background: #10b981; color: white; }
+        .snap-btn:hover { background: #059669; }
+        .close-cam-btn { background: #ef4444; color: white; }
+        .close-cam-btn:hover { background: #dc2626; }
+
+        /* SIDEBAR LỊCH SỬ CHAT */
         .sidebar { width: 300px; background: rgba(15, 23, 42, 0.6); padding: 25px 20px; display: flex; flex-direction: column; gap: 20px; color: white; border-right: 1px solid rgba(255, 255, 255, 0.05); }
         .user-info-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 14px; display: flex; align-items: center; gap: 12px; }
         .sidebar-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid #10b981; flex-shrink: 0; }
@@ -72,6 +98,7 @@
         .delete-history-btn { color: #ef4444; border: none; background: none; cursor: pointer; font-size: 14px; display: none; }
         .history-item:hover .delete-history-btn { display: inline-block; }
 
+        /* KHUNG KHÔNG GIAN CHAT */
         .chat-container { flex: 1; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.3); }
         .chat-header { background: rgba(15, 23, 42, 0.4); padding: 22px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .chat-header h2 { font-size: 18px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -89,8 +116,9 @@
         .bot-message { background: rgba(255, 255, 255, 0.06); color: #e2e8f0; border-top-left-radius: 4px; border: 1px solid rgba(255,255,255,0.03); }
         .user-wrapper { flex-direction: row-reverse; }
         .user-message { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; border-top-right-radius: 4px; }
-        .message-image { max-width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .message-image { max-width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1); display: block; }
 
+        /* THANH NHẬP LIỆU CẢI TIẾN NÚT QUÉT */
         .input-area { padding: 20px; background: rgba(15, 23, 42, 0.4); display: flex; align-items: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.05); position: relative; }
         .input-wrapper { flex: 1; display: flex; flex-direction: column; background: rgba(15, 23, 42, 0.6); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; }
         .input-wrapper:focus-within { border-color: #6366f1; }
@@ -102,8 +130,10 @@
         .input-area input { width: 100%; padding: 14px 20px; border: none; background: transparent; outline: none; font-size: 14px; color: white; }
         .input-area ::placeholder { color: #475569; }
         
-        .attach-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; width: 48px; height: 48px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .attach-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; width: 48px; height: 48px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; }
         .attach-btn:hover { color: white; background: rgba(255,255,255,0.1); }
+        .scan-face-btn { color: #34d399; border-color: rgba(52, 211, 153, 0.2); }
+        .scan-face-btn:hover { background: rgba(52, 211, 153, 0.15); color: #6ee7b7; border-color: #34d399; }
         
         .input-area .send-btn { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; width: 48px; height: 48px; border-radius: 16px; cursor: pointer; font-size: 16px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
 
@@ -140,6 +170,21 @@
             </div>
         </div>
 
+        <div id="camera-overlay" class="camera-overlay">
+            <div class="camera-box">
+                <h4>Quét Khuôn Mặt Nhận Diện Cảm Xúc</h4>
+                <div class="video-container">
+                    <div class="face-scanner-line"></div>
+                    <video id="webcam" autoplay playsinline></video>
+                </div>
+                <div class="camera-controls">
+                    <button class="cam-btn snap-btn" onclick="captureSnapshot()"><i class="fa-solid fa-expand"></i> Chụp ảnh & Phân tích</button>
+                    <button class="cam-btn close-cam-btn" onclick="stopWebcam()"><i class="fa-solid fa-xmark"></i> Hủy bỏ</button>
+                </div>
+                <canvas id="hidden-canvas" style="display: none;" width="640" height="480"></canvas>
+            </div>
+        </div>
+
         <div class="sidebar">
             <div class="user-info-box" id="user-info-display" style="display: none;">
                 <div class="sidebar-avatar"><img id="sidebar-avatar-img" src=""></div>
@@ -160,14 +205,16 @@
 
             <div class="input-area">
                 <input type="file" id="chat-attach-image" accept="image/*" style="display: none;" onchange="handleChatImageUpload(event)">
-                <label for="chat-attach-image" class="attach-btn" title="Tải ảnh lên"><i class="fa-solid fa-image"></i></label>
+                <label for="chat-attach-image" class="attach-btn" title="Tải ảnh từ thiết bị"><i class="fa-solid fa-image"></i></label>
+                
+                <button class="attach-btn scan-face-btn" onclick="startWebcam()" title="Quét khuôn mặt trực tiếp"><i class="fa-solid fa-face-smile"></i></button>
 
                 <div class="input-wrapper">
                     <div class="image-preview-container" id="chat-image-preview-container">
                         <img id="chat-image-preview-img" src="">
                         <button class="remove-preview-btn" onclick="removeChatImagePreview()"><i class="fa-solid fa-xmark"></i></button>
                     </div>
-                    <input type="text" id="user-input" placeholder="Bạn đang nghĩ gì?..." onkeypress="handleEnter(event)">
+                    <input type="text" id="user-input" placeholder="Bạn đang cảm thấy thế nào? Hoặc dùng tính năng quét khuôn mặt..." onkeypress="handleEnter(event)">
                 </div>
 
                 <button class="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
@@ -180,6 +227,9 @@
         const userInput = document.getElementById("user-input");
         const historyList = document.getElementById("history-list");
         const modalOverlay = document.getElementById("modal-overlay");
+        const cameraOverlay = document.getElementById("camera-overlay");
+        const videoElement = document.getElementById("webcam");
+        const hiddenCanvas = document.getElementById("hidden-canvas");
         const chatImagePreviewContainer = document.getElementById("chat-image-preview-container");
         const chatImagePreviewImg = document.getElementById("chat-image-preview-img");
 
@@ -187,10 +237,60 @@
         let currentUser = { name: "Bạn", year: "", code: "", parent: "", avatar: "" };
         let tempProfileAvatarBase64 = "";
         let currentChatImageBase64 = ""; 
+        let videoStream = null;
 
         const BOT_AVATAR_IMG = "https://cdn-icons-png.flaticon.com/512/8649/8649595.png";
         const DEFAULT_USER_AVATAR = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 
+        // ==========================================
+        // KHU VỰC XỬ LÝ CAMERA (LIVE WEB CAM)
+        // ==========================================
+        function startWebcam() {
+            cameraOverlay.style.display = "flex";
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+            .then(stream => {
+                videoStream = stream;
+                videoElement.srcObject = stream;
+            })
+            .catch(err => {
+                alert("Không thể truy cập Camera. Vui lòng cấp quyền camera cho trình duyệt!");
+                stopWebcam();
+            });
+        }
+
+        function stopWebcam() {
+            cameraOverlay.style.display = "none";
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            videoElement.srcObject = null;
+        }
+
+        function captureSnapshot() {
+            if (!videoStream) return;
+            const ctx = hiddenCanvas.getContext('2d');
+            // Vẽ lật ngược ảnh để giữ đúng góc nhìn gương chân thực cho học sinh
+            ctx.translate(hiddenCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(videoElement, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset ma trận vẽ
+
+            currentChatImageBase64 = hiddenCanvas.toDataURL('image/jpeg');
+            chatImagePreviewImg.src = currentChatImageBase64;
+            chatImagePreviewContainer.style.display = "block";
+            
+            if(!userInput.value.trim()){
+                userInput.value = "[Hệ thống]: Ảnh quét biểu cảm khuôn mặt thực tế.";
+            }
+            
+            stopWebcam();
+            userInput.focus();
+        }
+
+        // ==========================================
+        // QUẢN LÝ ẢNH FILE ĐÍNH KÈM THÔNG THƯỜNG
+        // ==========================================
         function handleChatImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
@@ -221,6 +321,9 @@
             }
         }
 
+        // ==========================================
+        // LƯU HỒ SƠ & QUẢN LÝ LỊCH SỬ CHAT
+        // ==========================================
         function checkUserInfo() { 
             let savedInfo = localStorage.getItem('mindguard_user'); 
             if (savedInfo) { 
@@ -250,7 +353,7 @@
             let parentInput = document.getElementById("input-parent").value.trim();
 
             if (!nameInput || !codeInput) { 
-                alert("Vui lòng nhập Tên và Mã học sinh nhé!"); 
+                alert("Vui lòng điền đủ Tên và Mã học sinh!"); 
                 return; 
             } 
 
@@ -277,9 +380,7 @@
                     renderSidebar();
                 }
             })
-            .catch(err => {
-                alert("Lỗi kết nối máy chủ! Vui lòng thử lại.");
-            });
+            .catch(err => alert("Lỗi lưu thông tin máy chủ!"));
         }
 
         function updateUserInfoDisplay() { 
@@ -330,7 +431,7 @@
 
         function deleteSession(sessionId, event) {
             event.stopPropagation();
-            if (confirm("Bạn có chắc chắn muốn xóa đoạn hội thoại này?")) {
+            if (confirm("Xóa đoạn hội thoại này?")) {
                 let sessions = getAllSessions();
                 delete sessions[sessionId];
                 saveAllSessions(sessions);
@@ -408,6 +509,9 @@
             if (indicator) indicator.remove();
         }
 
+        // ==========================================
+        // GỬI TIN NHẮN & HÌNH ẢNH QUA API BACKEND
+        // ==========================================
         function sendMessage() {
             let text = userInput.value.trim();
             let savedImg = currentChatImageBase64;
@@ -422,7 +526,7 @@
             if (sessions[currentSessionId]) {
                 sessions[currentSessionId].messages.push({ sender: "user", text: text, image: savedImg });
                 if (sessions[currentSessionId].title === "Đoạn chat mới" && text) {
-                    sessions[currentSessionId].title = text;
+                    sessions[currentSessionId].title = text.startsWith("[Hệ thống]") ? "Quét biểu cảm ảnh" : text;
                 }
                 saveAllSessions(sessions);
                 renderSidebar();
@@ -443,7 +547,6 @@
             .then(data => {
                 removeTypingIndicator();
                 let botReply = data.reply || "Mình đang lắng nghe bạn đây.";
-                
                 appendMessageToDOM('bot', botReply, "");
 
                 let postSessions = getAllSessions();
@@ -454,17 +557,11 @@
             })
             .catch(err => {
                 removeTypingIndicator();
-                appendMessageToDOM('bot', "Kết nối máy chủ bị gián đoạn. Bạn thử gửi lại tin nhắn nhé! 💙", "");
-                console.error(err);
+                appendMessageToDOM('bot', "Kết nối máy chủ lỗi. Thử lại nhé! 💙", "");
             });
         }
 
-        function handleEnter(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        }
-
+        function handleEnter(event) { if (event.key === "Enter") sendMessage(); }
         window.onload = checkUserInfo;
     </script>
 </body>
