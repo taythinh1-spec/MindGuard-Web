@@ -8,15 +8,17 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# Lấy API Key từ cấu hình hệ thống
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+# ==========================================
+# CẤU HÌNH API KEYS
+# ==========================================
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") 
 TELEGRAM_TOKEN = "8561921353:AAF8mzyV6ZEIe-x3eiwJEgQX90C1pKSngFc"
 TEACHER_CHAT_ID = "5871531291"
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 else:
-    print("⚠️ CHƯA CÓ GEMINI_API_KEY. VUI LÒNG CẤU HÌNH TRÊN RENDER ENVIRONMENT!")
+    print("⚠️ CẢNH BÁO: Chưa tìm thấy GEMINI_API_KEY!")
 
 try:
     model = genai.GenerativeModel('gemini-1.5-flash')
@@ -36,49 +38,50 @@ def parse_base64_image(base64_str):
 
 def get_ai_response(user_input, base64_image=None, is_scan=False):
     if not GEMINI_API_KEY or not model:
-        return {
-            "level": "Safe",
-            "reply": "Trợ lý AI đang đợi bạn cấu hình GEMINI_API_KEY trên môi trường Render Environment để bắt đầu phân tích thực tế nhé! 💙"
-        }
+        return {"level": "Safe", "reply": "Chưa có GEMINI_API_KEY trên Render!"}
 
     system_prompt = (
-        "Bạn là MindGuard - Trợ lý tâm lý học đường.\n"
-        "Nhiệm vụ: Phân tích biểu cảm cơ mặt (ánh mắt, nụ cười) từ bức ảnh quét trực tiếp của học sinh.\n"
-        "BẮT BUỘC: Hãy bóc tách trạng thái tâm lý thành các chỉ số % rõ ràng (Ví dụ: Vui vẻ: 20%, Áp lực: 50%, Mệt mỏi: 30%) "
-        "và đưa ra lời phân tích chi tiết, thấu cảm sâu sắc dựa trên khuôn mặt trong ảnh để chữa lành.\n\n"
-        "Phân loại mức độ nguy hiểm:\n"
-        "- 'Safe': Biểu cảm bình thường hoặc vui vẻ.\n"
-        "- 'Warning': Khuôn mặt u sầu, áp lực, mệt mỏi.\n"
-        "- 'Danger': Có từ khóa tiêu cực nặng hoặc biểu cảm tổn thương nặng.\n\n"
-        "BẮT BUỘC CHỈ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON, KHÔNG THÊM BẤT KỲ CHỮ NÀO KHÁC NGOÀI KHỐI NÀY:\n"
-        '{"level": "Safe/Warning/Danger", "reply": "Nội dung nhận xét chi tiết tỷ lệ % cảm xúc cơ mặt bằng tiếng Việt"}'
+        "Bạn là chuyên gia phân tích tâm lý qua khuôn mặt.\n"
+        "BẮT BUỘC: Nhìn ảnh và bóc tách thành các chỉ số %. VD: Vui vẻ: 20%, Áp lực: 50%, Mệt mỏi: 30%.\n"
+        "Sau đó phân tích thấu cảm.\n"
+        "TRẢ VỀ ĐÚNG CHUỖI JSON SAU:\n"
+        '{"level": "Safe", "reply": "Câu trả lời của bạn ở đây..."}'
     )
 
-    prompt_text = user_input
-    if is_scan:
-        prompt_text = "Tôi vừa quét biểu cảm khuôn mặt. Hãy phân tích ảnh, bóc tách chỉ số % cảm xúc và nói chuyện thấu cảm với tôi."
-
-    contents = [system_prompt, f"Học sinh: '{prompt_text}'"]
+    prompt_text = "Hãy bóc tách % cảm xúc từ ảnh này và nói chuyện với tôi." if is_scan else user_input
+    contents = [system_prompt, prompt_text]
+    
     if base64_image:
         img_part = parse_base64_image(base64_image)
         if img_part:
             contents.append(img_part)
 
     try:
-        response = model.generate_content(contents, generation_config={"response_mime_type": "application/json"})
-        return json.loads(response.text.strip())
+        # Tắt toàn bộ bộ lọc an toàn để Google không chặn ảnh khuôn mặt
+        safety_settings = [
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
+        ]
+        
+        response = model.generate_content(contents, safety_settings=safety_settings)
+        text_resp = response.text.strip()
+        
+        # Trích xuất JSON an toàn
+        if "{" in text_resp and "}" in text_resp:
+            start = text_resp.find('{')
+            end = text_resp.rfind('}') + 1
+            return json.loads(text_resp[start:end])
+        else:
+            return {"level": "Safe", "reply": text_resp}
+            
     except Exception as e:
-        print(f"Lỗi gọi Gemini API: {e}")
-        # Chế độ tự động xử lý từ khóa khẩn cấp
-        danger_keywords = ["tự tử", "chết", "tự sát", "không muốn sống", "tuyệt vọng"]
-        if any(word in user_input.lower() for word in danger_keywords):
-            return {
-                "level": "Danger",
-                "reply": "Mình cảm nhận được bạn đang chịu áp lực rất lớn. Đừng cô đơn một mình, mình đã gửi tín hiệu để thầy cô hỗ trợ bạn ngay lúc này nhé! ❤️"
-            }
+        # NẾU CÓ LỖI, IN THẲNG RA MÀN HÌNH ĐỂ BẮT BỆNH
+        print(f"Lỗi API: {e}")
         return {
             "level": "Safe",
-            "reply": "Mình đã nhận được hình ảnh quét khuôn mặt của bạn. Cơ mặt và nụ cười này cho thấy bạn đang cố gắng rất nhiều nhưng ẩn chứa chút lo âu đúng không? Hãy tâm sự thêm với mình nhé! 💙"
+            "reply": f"🚨 Hệ thống báo lỗi: {str(e)}. Bạn hãy chụp lỗi này lại nhé!"
         }
 
 @app.route('/')
@@ -90,14 +93,13 @@ def chat():
     try:
         data_req = request.json or {}
         user_msg = data_req.get('message', '')
-        student_code = data_req.get('student_code', 'Khách').upper().strip()
         chat_image = data_req.get('image', None)
         is_scan = data_req.get('is_scan', False)
         
         data = get_ai_response(user_msg, base64_image=chat_image, is_scan=is_scan)
         return jsonify(data)
-    except Exception:
-        return jsonify({"level": "Safe", "reply": "Kết nối đang ổn định lại, bạn hãy thử lại nhé!"})
+    except Exception as e:
+        return jsonify({"level": "Safe", "reply": f"Lỗi Web: {str(e)}"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
