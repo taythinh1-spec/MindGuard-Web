@@ -41,7 +41,7 @@ def save_db(data):
     except Exception as e:
         print(f"Lỗi lưu file dữ liệu: {e}")
 
-# Kết nối model AI
+# Kết nối model AI phù hợp
 try:
     valid_models = [m.name.replace("models/", "") for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
     chosen_model = 'gemini-1.5-flash' if 'gemini-1.5-flash' in valid_models else valid_models[0]
@@ -49,7 +49,7 @@ except Exception:
     chosen_model = 'gemini-1.5-flash'
 
 model = genai.GenerativeModel(chosen_model)
-print(f"🧠 MINDGUARD ĐÃ KẾT NỐI VỚI MODEL CAMERA: {chosen_model}")
+print(f"🧠 MINDGUARD ĐÃ KẾT NỐI VỚI MODEL AI: {chosen_model}")
 
 # ==========================================
 # HÀM GỬI CẢNH BÁO TELEGRAM
@@ -66,18 +66,25 @@ def send_alert(msg, reply, chat_id, role, student_code, student_name):
     except Exception as e:
         print(f"Lỗi gửi Telegram ({role}): {e}", flush=True)
 
+# ==========================================
+# KHU VỰC SỬA LỖI ĐỊNH DẠNG ẢNH BASE64 SANG BYTES
+# ==========================================
 def parse_base64_image(base64_str):
     try:
         if base64_str and "," in base64_str:
             header, base64_data = base64_str.split(",", 1)
             mime_type = header.split(";")[0].split(":")[1]
-            return {"mime_type": mime_type, "data": base64_data}
+            
+            # ĐÃ SỬA TẠI ĐÂY: Giải mã chuỗi văn bản Base64 thành dữ liệu Bytes thô để Gemini đọc được
+            img_bytes = base64.b64decode(base64_data)
+            
+            return {"mime_type": mime_type, "data": img_bytes}
     except Exception as e:
         print(f"Lỗi phân tích Base64 ảnh: {e}")
     return None
 
 # ==========================================
-# HÀM XỬ LÝ LÕI AI GEMINI (ĐÃ TỐI ƯU CHO CHỨC NĂNG QUÉT FACE)
+# HÀM XỬ LÝ LÕI AI GEMINI (PHÂN TÍCH KHUÔN MẶT THỰC TẾ)
 # ==========================================
 def get_ai_response(user_input, base64_image=None):
     system_prompt = (
@@ -85,19 +92,20 @@ def get_ai_response(user_input, base64_image=None):
         "Hãy lắng nghe thấu cảm sâu sắc, hỗ trợ giảm nhẹ áp lực học tập và cuộc sống.\n"
         "Nhiệm vụ của bạn là phân tích nội dung học sinh cung cấp bao gồm văn bản và hình ảnh.\n"
         "ĐẶC BIỆT: Nếu có hình ảnh khuôn mặt gửi kèm từ webcam, hãy đóng vai trò như một máy quét cảm xúc thông minh. "
-        "Hãy nhìn kỹ biểu cảm (mắt, miệng, cơ mặt, cử chỉ) để đoán xem bạn ấy đang vui, buồn, mệt mỏi, áp lực hay bất an và đưa ra lời nhận xét thấu cảm chân thành nhất.\n\n"
-        "Sau đó, phân loại tình trạng theo 3 mức độ:\n"
+        "Hãy nhìn thật kỹ biểu cảm (nụ cười, ánh mắt, chân mày, cơ mặt, cử chỉ) để đoán xem bạn ấy đang thực sự vui vẻ, "
+        "hay đang cười gượng, u sầu, mệt mỏi, áp lực, lo lắng hoặc bất an, rồi đưa ra lời nhận xét thấu cảm chân thành, cá nhân hóa nhất theo bức ảnh.\n\n"
+        "Sau đó, phân loại tình trạng theo 3 mức độ nguy hiểm:\n"
         "- 'Safe': Trò chuyện thông thường, chia sẻ áp lực nhẹ, hoặc khuôn mặt bình thường/vui vẻ.\n"
-        "- 'Warning': Có dấu hiệu khủng hoảng tinh thần, khuôn mặt u sầu, kiệt quệ, khóc lóc.\n"
+        "- 'Warning': Có dấu hiệu khủng hoảng tinh thần nhẹ, khuôn mặt u sầu, kiệt quệ, khóc lóc.\n"
         "- 'Danger': Có ý định làm đau bản thân, tự tử, hoặc hình ảnh thể hiện sự thương tổn nguy hiểm.\n\n"
-        "BẮT BUỘC CHỈ TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON, KHÔNG THÊM BẤT KỲ CHỮ NÀO KHÁC NGOÀI KHỐI JSON NÀY:\n"
-        '{"level": "Safe/Warning/Danger", "reply": "Nội dung phản hồi nhẹ nhàng, phân tích biểu cảm và chữa lành chân thành bằng tiếng Việt"}'
+        "BẮT BUỘC CHỈ TRẢ VỀ ĐÚNG ĐỊNH DẠNG KHỐI JSON, KHÔNG THÊM BẤT KỲ KÝ TỰ HOẶC CHỮ NÀO KHÁC NGOÀI KHỐI JSON NÀY:\n"
+        '{"level": "Safe/Warning/Danger", "reply": "Nội dung phản hồi nhẹ nhàng, thấu cảm sâu sắc, nhận xét chi tiết dựa trên biểu cảm khuôn mặt trong ảnh bằng tiếng Việt"}'
     )
     
-    # Điều chỉnh câu lệnh nếu đây là ảnh quét trực tiếp từ hệ thống webcam
+    # Điều chỉnh câu lệnh nếu phát hiện đây là ảnh quét tự động từ camera của hệ thống
     prompt_text = user_input
     if "[Hệ thống]" in user_input:
-        prompt_text = "Tôi vừa thực hiện quét khuôn mặt của mình bằng webcam trực tiếp. Hãy phân tích biểu cảm của tôi qua bức ảnh đi kèm này và trò chuyện với tôi nhé."
+        prompt_text = "Tôi vừa thực hiện quét khuôn mặt của mình bằng webcam trực tiếp. Hãy nhìn bức ảnh đi kèm, phân tích biểu cảm khuôn mặt hiện tại của tôi xem tôi đang cảm thấy thế nào và trò chuyện trò chuyện cùng tôi nhé."
 
     contents = [system_prompt, f"Yêu cầu từ học sinh: '{prompt_text}'"]
     
@@ -110,6 +118,7 @@ def get_ai_response(user_input, base64_image=None):
         response = model.generate_content(contents)
         raw_text = response.text.strip()
         
+        # Trích xuất chuỗi cấu trúc JSON đề phòng AI sinh thừa ký tự markdown
         start_idx = raw_text.find('{')
         end_idx = raw_text.rfind('}')
         
@@ -120,7 +129,8 @@ def get_ai_response(user_input, base64_image=None):
             raise Exception("Lỗi cấu trúc định dạng JSON từ Gemini") 
             
     except Exception as e:
-        error_msg = str(e)
+        print(f"❌ Gặp lỗi khi gọi Gemini API: {e}")
+        # Cơ chế bắt lỗi dự phòng tự động khi hệ thống quá tải hoặc gặp từ khóa nguy hiểm
         danger_keywords = ["tự tử", "chết", "tự sát", "không muốn sống", "tuyệt vọng", "kết thúc", "rạch tay"]
         if any(word in user_input.lower() for word in danger_keywords):
             return {
@@ -128,10 +138,10 @@ def get_ai_response(user_input, base64_image=None):
                 "reply": "Mình cảm nhận được bạn đang chịu đựng một nỗi đau rất lớn. Hãy dừng lại một chút, mình luôn ở đây nghe bạn. Đồng thời, mình đã phát tín hiệu khẩn cấp đến thầy cô và gia đình để hỗ trợ bạn ngay lập tức. Bạn không cô đơn đâu! ❤️"
             }
         
-        if "429" in error_msg or "quota" in error_msg.lower():
-            return {"level": "Safe", "reply": "Mình đang bận xử lý dữ liệu một chút. Bạn chờ khoảng 30 giây rồi gửi lại ảnh/tin nhắn giúp mình nhé! 💙"}
+        if "429" in str(e) or "quota" in str(e).lower():
+            return {"level": "Safe", "reply": "Hệ thống AI đang nhận quá nhiều lượt quét ảnh cùng lúc. Bạn chờ khoảng 10 giây rồi bấm gửi lại ảnh giúp mình nhé! 💙"}
         
-        return {"level": "Safe", "reply": "Mình đã nhận được hình ảnh khuôn mặt của bạn. Nhìn bạn có vẻ đang có nhiều tâm sự đúng không? Hãy nói cho mình biết rõ hơn nhé!"}
+        return {"level": "Safe", "reply": "Mình đã nhận được ảnh khuôn mặt của bạn. Nhìn bạn có vẻ đang mang nhiều suy tư đúng không? Hãy nhắn tin chia sẻ rõ hơn với mình nha!"}
 
 # ==========================================
 # CÁC ROUTE ĐIỀU HƯỚNG FLASK
@@ -179,9 +189,9 @@ def chat():
             
         data = get_ai_response(user_msg, base64_image=chat_image)
         if not data or not isinstance(data, dict):
-            data = {"level": "Safe", "reply": "Mình vẫn đang ở đây đồng hành cùng bạn."}
+            data = {"level": "Safe", "reply": "Mình vẫn đang ở đây đồng hành và lắng nghe bạn."}
         
-        # Nếu quét ra biểu cảm nguy hiểm hoặc nhắn tin tiêu cực, kích hoạt gửi Telegram lập tức
+        # Nếu quét ra biểu cảm nguy hiểm hoặc nhắn tin có xu hướng tiêu cực nặng
         if data.get('level') == 'Danger':
             send_alert(user_msg, data.get('reply'), TEACHER_CHAT_ID, "Giáo viên", student_code, student_name)
             if parent_id:
@@ -191,7 +201,7 @@ def chat():
 
     except Exception as global_err:
         traceback.print_exc()
-        return jsonify({"level": "Safe", "reply": "Hệ thống camera kết nối bị lag. Bạn quét lại hoặc nhắn tin nhé!"})
+        return jsonify({"level": "Safe", "reply": "Hệ thống camera đang kết nối lại. Bạn hãy quét lại biểu cảm hoặc nhắn tin cho mình nhé!"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
