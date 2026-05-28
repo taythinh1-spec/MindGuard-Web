@@ -3,311 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindGuard AI - Hệ Thống Trợ Lý Tâm Lý & Quét Biểu Cảm</title>
-    <link href="[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap)" rel="stylesheet">
-    <link href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css)" rel="stylesheet">
+    <title>MindGuard AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #0b0f19; height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; color: #f1f5f9; overflow: hidden; }
+        body { background: #0b0f19; height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; color: #f1f5f9; }
+        .app-wrapper { display: flex; width: 1300px; height: 850px; background: #131a2e; border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; overflow: hidden; }
         
-        .app-wrapper { display: flex; width: 1350px; height: 885px; background: #131a2e; border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        /* KHUNG CHAT */
+        .chat-section { flex: 1; display: flex; flex-direction: column; background: #0f1524; }
+        .chat-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
+        .chat-header h2 { font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .student-tag { background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 8px; font-size: 13px; color: #94a3b8; }
         
-        /* CỘT CHAT BÊN TRÁI */
-        .chat-sidebar-section { flex: 1; display: flex; flex-direction: column; border-right: 1px solid rgba(255,255,255,0.06); background: #0f1524; }
-        .chat-header { padding: 22px 25px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
-        .chat-header-left { display: flex; flex-direction: column; gap: 4px; }
-        .chat-header h2 { font-size: 19px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 10px; }
-        .chat-header h2 i { color: #3b82f6; }
-        .ai-status-indicator { font-size: 12px; color: #10b981; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-        .ai-status-indicator::before { content: ""; display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
-        .student-profile-label { background: rgba(255, 255, 255, 0.05); padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; color: #94a3b8; border: 1px solid rgba(255,255,255,0.08); }
-        
-        .chat-box { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; background: #0d1220; }
-        
-        /* MESSAGE BUBBLES */
-        .msg-row { display: flex; gap: 14px; width: 100%; animation: fadeIn 0.3s ease forwards; }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #0d1220; }
+        .msg-row { display: flex; gap: 12px; width: 100%; animation: fadeIn 0.2s ease; }
         .msg-row.bot { justify-content: flex-start; }
         .msg-row.user { justify-content: flex-end; flex-direction: row-reverse; }
         
-        .avatar { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); }
-        .msg-row.bot .avatar { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); }
-        .msg-row.user .avatar { background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3); }
-        .avatar img { width: 65%; height: 65%; object-fit: contain; }
+        .avatar { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #1e293b; color: #fff; font-size: 14px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
+        .msg-row.bot .avatar { background: #3b82f6; }
+        .msg-row.user .avatar { background: #a855f7; }
         
-        .bubble-wrapper { max-width: 72%; display: flex; flex-direction: column; gap: 4px; }
-        .bubble-sender-title { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; padding-left: 4px; }
-        .msg-row.bot .bubble-sender-title { color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 6px; width: max-content; margin-bottom: 3px; font-size: 10px; }
-        
-        .bubble { padding: 15px 18px; border-radius: 16px; font-size: 14px; line-height: 1.55; color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .msg-row.bot .bubble { background: #1e293b; border-top-left-radius: 4px; border: 1px solid rgba(255,255,255,0.02); }
-        .msg-row.user .bubble { background: #1f2937; color: #e2e8f0; border-top-right-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
-        .bubble-img { max-width: 100%; border-radius: 12px; margin-top: 10px; display: block; border: 1px solid rgba(255,255,255,0.1); }
+        .bubble-wrapper { max-width: 75%; display: flex; flex-direction: column; gap: 4px; }
+        .sender-title { font-size: 11px; font-weight: 700; color: #64748b; }
+        .bubble { padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.5; color: #cbd5e1; }
+        .msg-row.bot .bubble { background: #1e293b; border-top-left-radius: 4px; }
+        .msg-row.user .bubble { background: #1f2937; border-top-right-radius: 4px; }
+        .bubble-img { max-width: 100%; max-height: 250px; border-radius: 8px; margin-top: 8px; display: block; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* THANH INPUT CHAT */
-        .input-bar { padding: 22px 25px; background: #0f1524; display: flex; gap: 14px; border-top: 1px solid rgba(255,255,255,0.06); align-items: center; }
-        .input-field-wrapper { flex: 1; background: #111827; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; display: flex; align-items: center; padding: 0 18px; }
-        .input-field-wrapper input { flex: 1; padding: 15px 5px; border: none; background: transparent; outline: none; color: white; font-size: 14px; }
-        .input-field-wrapper ::placeholder { color: #4b5563; }
-        
-        .send-btn { background: #3b82f6; color: white; border: none; width: 48px; height: 48px; border-radius: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 16px; transition: 0.2s; }
-        .send-btn:hover { background: #2563eb; transform: scale(1.03); }
+        .input-bar { padding: 15px 20px; background: #0f1524; display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .input-wrapper { flex: 1; background: #111827; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; padding: 0 15px; }
+        .input-wrapper input { flex: 1; padding: 12px 0; border: none; background: transparent; outline: none; color: white; font-size: 14px; }
+        .send-btn { background: #3b82f6; color: white; border: none; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
 
-        /* CỘT CAMERA BÊN PHẢI */
-        .camera-section { width: 400px; background: #111827; padding: 35px 25px; display: flex; flex-direction: column; align-items: center; gap: 28px; border-left: 1px solid rgba(255,255,255,0.02); }
-        .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #4b5563; width: 100%; text-align: left; }
-        
-        /* KHUNG CAMERA TRÒN BIỂU DIỄN VIỄN TƯỞNG */
-        .camera-circle-container { width: 250px; height: 250px; border-radius: 50%; position: relative; display: flex; justify-content: center; align-items: center; background: #090d16; box-shadow: 0 0 40px rgba(59, 130, 246, 0.15); }
-        
-        /* Vòng định vị cyan nhấp nháy */
-        .tech-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px dashed rgba(6, 182, 212, 0.3); animation: rotateRing 25s linear infinite; }
-        .tech-ring-inner { position: absolute; width: 92%; height: 92%; border-radius: 50%; border: 1px solid rgba(59, 130, 246, 0.2); }
-        @keyframes rotateRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .video-mask { width: 84%; height: 84%; border-radius: 50%; overflow: hidden; position: relative; z-index: 5; border: 2px solid #1e3a8a; transform: scaleX(-1); }
+        /* CAMERA SECTION */
+        .camera-section { width: 360px; background: #111827; padding: 25px; display: flex; flex-direction: column; align-items: center; gap: 20px; border-left: 1px solid rgba(255,255,255,0.06); }
+        .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #4b5563; width: 100%; }
+        .camera-container { width: 220px; height: 220px; border-radius: 50%; position: relative; display: flex; justify-content: center; align-items: center; background: #090d16; border: 2px dashed rgba(6, 182, 212, 0.4); }
+        .video-mask { width: 85%; height: 85%; border-radius: 50%; overflow: hidden; transform: scaleX(-1); }
         .video-mask video { width: 100%; height: 100%; object-fit: cover; }
+        .scan-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; background: #1e1b4b; border: 1px solid rgba(99,102,241,0.3); color: #fff; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .scan-btn:hover { background: #2e1065; }
         
-        /* Dải laser quét màu lục */
-        .scanner-line { position: absolute; width: 100%; height: 3px; background: linear-gradient(to right, transparent, #10b981, transparent); top: 0; left: 0; animation: scanAnimation 2.2s ease-in-out infinite; z-index: 10; display: none; box-shadow: 0 0 8px #10b981; }
-        @keyframes scanAnimation { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
-        
-        /* Số đếm ngược */
-        .countdown-overlay { position: absolute; font-size: 72px; font-weight: 800; color: #10b981; z-index: 20; display: none; text-shadow: 0 0 25px rgba(16, 185, 129, 0.6); font-family: monospace; }
-        
-        /* Nút kích hoạt quét màu xanh tím tối */
-        .scan-action-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: #1e1b4b; border: 1px solid rgba(99, 102, 241, 0.2); color: #e2e8f0; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .scan-action-btn:hover { background: #2e1065; border-color: rgba(168, 85, 247, 0.4); transform: translateY(-1px); }
-        
-        /* LỊCH SỬ QUÉT */
-        .history-wrapper { width: 100%; flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
-        .history-card { background: #111827; border: 1px solid rgba(255,255,255,0.04); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; }
-        .history-mini-pic { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); transform: scaleX(-1); }
-        .history-mini-pic img { width: 100%; height: 100%; object-fit: cover; }
-        .history-info { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-        .history-info .time { font-size: 12px; color: #4b5563; }
-        .history-info .status { font-size: 13px; font-weight: 600; color: #e2e8f0; display: flex; align-items: center; gap: 6px; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; }
-        .status-dot.warning { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
-        .status-dot.danger { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
-
-        /* HIỆU ỨNG CHỮ CHẠY ĐỘNG KHI ĐANG PHÂN TÍCH */
-        .loading-row { display: flex; align-items: center; gap: 5px; padding: 4px 5px; }
-        .loading-row span { width: 6px; height: 6px; background: #3b82f6; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
-        .loading-row span:nth-child(1) { animation-delay: -0.32s; }
-        .loading-row span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .history-card { background: #0f1524; width: 100%; border-radius: 10px; padding: 10px 15px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.04); }
+        .history-pic { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; transform: scaleX(-1); }
+        .history-pic img { width: 100%; height: 100%; object-fit: cover; }
+        .history-info { display: flex; flex-direction: column; gap: 2px; }
+        .history-info .status { font-size: 13px; font-weight: 600; color: #10b981; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="app-wrapper">
-        <div class="chat-sidebar-section">
+        <div class="chat-section">
             <div class="chat-header">
-                <div class="chat-header-left">
-                    <h2><i class="fa-solid fa-shield-halved"></i> MindGuard AI</h2>
-                    <div class="ai-status-indicator">Đang hoạt động — Mô hình Gemini 1.5 Flash</div>
-                </div>
-                <div class="student-profile-label" id="student-display-tag">nguyen van b - HS001</div>
+                <h2><i class="fa-solid fa-brain"></i> MindGuard AI</h2>
+                <div class="student-tag" id="student-tag">THỊNH - 2007</div>
             </div>
-            
-            <div class="chat-box" id="chat-box-area">
+            <div class="chat-box" id="chat-box">
                 <div class="msg-row bot">
-                    <div class="avatar"><img src="[https://cdn-icons-png.flaticon.com/512/4712/4712139.png](https://cdn-icons-png.flaticon.com/512/4712/4712139.png)"></div>
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
                     <div class="bubble-wrapper">
-                        <div class="bubble-sender-title">• Ổn định</div>
-                        <div class="bubble">Xin chào! Mình là MindGuard — trợ lý tâm lý học đường của bạn. 💙<br><br>Bạn có thể <b>nhắn tin</b> chia sẻ cảm xúc, hoặc dùng tính năng <b>Quét Khuôn Mặt</b> bên phải để mình đọc hiểu trạng thái của bạn nhé!</div>
+                        <div class="sender-title">MINDGUARD AI</div>
+                        <div class="bubble">Xin chào Thịnh! Mình đã sẵn sàng đồng hành cùng bạn. Hãy nhấn nút Quét Khuôn Mặt bên phải để mình lắng nghe cảm xúc của bạn qua sinh trắc học nhé! 💙</div>
                     </div>
                 </div>
             </div>
-            
             <div class="input-bar">
-                <div class="input-field-wrapper">
-                    <input type="text" id="chat-user-input" placeholder="Chia sẻ cảm xúc của bạn hôm nay..." onkeypress="handleKey(event)">
+                <div class="input-wrapper">
+                    <input type="text" id="user-input" placeholder="Nhập tin nhắn tâm sự..." onkeypress="if(event.key==='Enter') sendText()">
                 </div>
-                <button class="send-btn" onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                <button class="send-btn" onclick="sendText()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
 
         <div class="camera-section">
-            <div class="section-title">Máy Quét Cảm Xúc AI</div>
-            
-            <div class="camera-circle-container">
-                <div class="tech-ring"></div>
-                <div class="tech-ring-inner"></div>
-                <div class="countdown-overlay" id="countdown-text">3</div>
+            <div class="section-title">MÁY QUẾT SINH TRẮC HỌC</div>
+            <div class="camera-container">
                 <div class="video-mask">
-                    <div class="scanner-line" id="laser-bar"></div>
-                    <video id="camera-stream" autoplay playsinline></video>
+                    <video id="webcam" autoplay playsinline></video>
                 </div>
             </div>
+            <button class="scan-btn" id="scan-btn" onclick="startScan()"><i class="fa-solid fa-camera"></i> BẮT ĐẦU QUẾT KHUÔN MẶT</button>
             
-            <button class="scan-action-btn" id="master-scan-btn" onclick="triggerFaceScanProcess()"><i class="fa-solid fa-camera"></i> BẮT ĐẦU QUẾT KHUÔN MẶT</button>
-            
-            <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Lần Quét Gần Nhất</div>
-            <div class="history-wrapper" id="scan-history-panel">
-                </div>
+            <div class="section-title" style="margin-top: 10px;">LẦN QUẾT GẦN NHẤT</div>
+            <div id="history-box" style="width: 100%; display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
     </div>
 
-    <canvas id="snapshot-canvas" style="display: none;" width="640" height="480"></canvas>
+    <canvas id="canvas" style="display: none;" width="640" height="480"></canvas>
 
     <script>
-        const chatBox = document.getElementById("chat-box-area");
-        const chatInput = document.getElementById("chat-user-input");
-        const videoElement = document.getElementById("camera-stream");
-        const laserBar = document.getElementById("laser-bar");
-        const countdownText = document.getElementById("countdown-text");
-        const scanBtn = document.getElementById("master-scan-btn");
-        const historyPanel = document.getElementById("scan-history-panel");
-        const snapshotCanvas = document.getElementById("snapshot-canvas");
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
+        const video = document.getElementById("webcam");
+        const canvas = document.getElementById("canvas");
+        const scanBtn = document.getElementById("scan-btn");
+        const historyBox = document.getElementById("history-box");
 
-        let activeStream = null;
-        let studentProfile = { name: "nguyen van b", code: "HS001" };
+        navigator.mediaDevices.getUserMedia({ video: true }).then(s => video.srcObject = s).catch(e => console.log(e));
 
-        window.onload = function() {
-            // Tải thông tin học sinh nếu có lưu trong bộ nhớ tạm
-            let saved = localStorage.getItem('mindguard_user');
-            if(saved) {
-                studentProfile = JSON.parse(saved);
-            }
-            document.getElementById("student-display-tag").innerText = `${studentProfile.name} - ${studentProfile.code}`;
-            initWebcamStream();
-            loadLocalStorageScanHistory();
-        }
-
-        function initWebcamStream() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
-            .then(stream => {
-                activeStream = stream;
-                videoElement.srcObject = stream;
-            })
-            .catch(err => {
-                console.log("Không thể mở Webcam:", err);
-            });
-        }
-
-        // KÍCH HOẠT QUY TRÌNH QUẾT CẢM XÚC ĐẾM NGƯỢC
-        function triggerFaceScanProcess() {
-            if (!activeStream) {
-                alert("Hãy cấp quyền truy cập Camera cho trình duyệt!");
-                initWebcamStream();
-                return;
-            }
-
-            scanBtn.disabled = true;
-            scanBtn.style.opacity = "0.6";
-            laserBar.style.display = "block"; 
-            
-            let currentCount = 3;
-            countdownText.innerText = currentCount;
-            countdownText.style.display = "block";
-
-            let interval = setInterval(() => {
-                currentCount--;
-                if (currentCount > 0) {
-                    countdownText.innerText = currentCount;
-                } else {
-                    clearInterval(interval);
-                    countdownText.style.display = "none";
-                    laserBar.style.display = "none";
-                    
-                    // Thực hiện chụp ảnh và gửi phân tích
-                    executeSnapshotAndAnalyze();
-                }
-            }, 1000);
-        }
-
-        function executeSnapshotAndAnalyze() {
-            const ctx = snapshotCanvas.getContext('2d');
-            ctx.translate(snapshotCanvas.width, 0);
-            ctx.scale(-1, 1);
-            ctx.drawImage(videoElement, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-            ctx.setTransform(1, 0, 0, 1, 0, 0); 
-
-            const base64Image = snapshotCanvas.toDataURL('image/jpeg');
-
-            // Đẩy giao diện ảnh quét của học sinh lên khung chat
-            appendMsgRow('user', "An toàn", "[Hệ thống]: Ảnh quét biểu cảm khuôn mặt thực tế.", base64Image);
-            showDynamicLoadingState();
-
-            fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: "[Hệ thống]: Ảnh biểu cảm khuôn mặt thực tế.",
-                    student_code: studentProfile.code,
-                    image: base64Image,
-                    is_scan: true
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                removeLoadingState();
-                appendMsgRow('bot', data.level, data.reply);
-                pushToScanHistory(data.level, base64Image);
-                
-                scanBtn.disabled = false;
-                scanBtn.style.opacity = "1";
-            })
-            .catch(err => {
-                removeLoadingState();
-                appendMsgRow('bot', "Safe", "Hệ thống AI đã nhận được hình ảnh. Hãy nhắn thêm vài chữ để mình hiểu bạn đang cảm thấy thế nào nhé! 💙");
-                scanBtn.disabled = false;
-                scanBtn.style.opacity = "1";
-            });
-        }
-
-        // HIỂN THỊ TIẾN TRÌNH CHỮ CHẠY ĐỘNG
-        function showDynamicLoadingState() {
-            let loadBox = document.createElement("div");
-            loadBox.id = "loading-indicator-box";
-            loadBox.className = "msg-row bot";
-            loadBox.innerHTML = `
-                <div class="avatar"><img src="[https://cdn-icons-png.flaticon.com/512/4712/4712139.png](https://cdn-icons-png.flaticon.com/512/4712/4712139.png)"></div>
-                <div class="bubble-wrapper">
-                    <div class="bubble" style="padding: 12px 18px;">
-                        <div class="loading-row">
-                            <span></span><span></span><span></span>
-                            <small id="changing-text" style="color: #6b7280; font-size: 13px; margin-left: 6px; font-weight:500;">Hệ thống AI đang định vị khuôn mặt...</small>
-                        </div>
-                    </div>
-                </div>
-            `;
-            chatBox.appendChild(loadBox);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            let phrases = ["Đang định vị cơ mặt...", "AI đang phân tích biểu cảm mắt và nụ cười...", "Đang tính toán tỷ lệ % cảm xúc..."];
-            let idx = 0;
-            window.loadingInterval = setInterval(() => {
-                let el = document.getElementById("changing-text");
-                if(el) {
-                    el.innerText = phrases[idx % phrases.length];
-                    idx++;
-                }
-            }, 800);
-        }
-
-        function removeLoadingState() {
-            clearInterval(window.loadingInterval);
-            let loadBox = document.getElementById("loading-indicator-box");
-            if (loadBox) loadBox.remove();
-        }
-
-        function appendMsgRow(sender, level, text, imgBase64 = "") {
-            let row = document.createElement("div");
+        function appendMsg(sender, text, img = "") {
+            const row = document.createElement("div");
             row.className = `msg-row ${sender}`;
+            const avatarHtml = sender === 'bot' ? '<i class="fa-solid fa-robot"></i>' : '<i class="fa-solid fa-user"></i>';
+            const title = sender === 'bot' ? 'MINDGUARD AI' : 'HỌC SINH';
             
-            let avtSrc = sender === 'user' ? "[https://cdn-icons-png.flaticon.com/512/3177/3177440.png](https://cdn-icons-png.flaticon.com/512/3177/3177440.png)" : "[https://cdn-icons-png.flaticon.com/512/4712/4712139.png](https://cdn-icons-png.flaticon.com/512/4712/4712139.png)";
-            
-            let statusLabel = "• ỔN ĐỊNH";
-            if(level === 'Warning') statusLabel = "• CẢNH BÁO NHẸ";
-            if(level === 'Danger') statusLabel = "• NGUY HIỂM";
-
-            let html = `<div class="avatar"><img src="${avtSrc}"></div><div class="bubble-wrapper"><div class="bubble-sender-title">${statusLabel}</div><div class="bubble">${text}`;
-            if(imgBase64) {
-                html += `<img class="bubble-img" src="${imgBase64}">`;
-            }
+            let html = `<div class="avatar">${avatarHtml}</div><div class="bubble-wrapper"><div class="sender-title">${title}</div><div class="bubble">${text}`;
+            if(img) html += `<img class="bubble-img" src="${img}">`;
             html += `</div></div>`;
             
             row.innerHTML = html;
@@ -315,66 +121,62 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function sendTextMessage() {
-            let val = chatInput.value.trim();
+        function sendText() {
+            const val = userInput.value.trim();
             if(!val) return;
-            appendMsgRow('user', 'Safe', val);
-            chatInput.value = "";
+            appendMsg('user', val);
+            userInput.value = "";
 
             fetch('/chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: val, student_code: studentProfile.code })
-            })
-            .then(res => res.json())
-            .then(data => appendMsgRow('bot', data.level, data.reply))
-            .catch(() => appendMsgRow('bot', 'Safe', "Gặp lỗi kết nối đường truyền AI. Hãy thử lại sau nha!"));
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: val, student_code: "THỊNH" })
+            }).then(r => r.json()).then(d => appendMsg('bot', d.reply));
         }
 
-        function handleKey(e) { if(e.key === "Enter") sendTextMessage(); }
-
-        // QUẢN LÝ LƯU TRỮ LỊCH SỬ QUÉT GẦN NHẤT
-        function pushToScanHistory(level, imgData) {
-            let now = new Date();
-            let timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+        function startScan() {
+            scanBtn.disabled = true;
+            scanBtn.innerText = "ĐANG PHÂN TÍCH...";
             
-            let statusText = "An toàn";
-            let dotClass = "safe";
-            if(level === 'Warning') { statusText = "Lo âu / Mệt mỏi"; dotClass = "warning"; }
-            if(level === 'Danger') { statusText = "Nguy cơ cao"; dotClass = "danger"; }
+            setTimeout(() => {
+                const ctx = canvas.getContext('2d');
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                ctx.setTransform(1,0,0,1,0,0);
+                
+                const base64Img = canvas.toDataURL('image/jpeg');
+                appendMsg('user', "[Hệ thống]: Ảnh quét biểu cảm khuôn mặt thực tế.", base64Img);
 
-            let item = { img: imgData, time: timeStr, status: statusText, dot: dotClass };
-            let historyList = JSON.parse(localStorage.getItem('mindguard_history_scans')) || [];
-            historyList.unshift(item);
-            if(historyList.length > 3) historyList.pop(); 
-            localStorage.setItem('mindguard_history_scans', JSON.stringify(historyList));
-
-            renderHistoryListPanel(historyList);
+                fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: "", student_code: "THỊNH", image: base64Img, is_scan: true })
+                }).then(r => r.json()).then(d => {
+                    appendMsg('bot', d.reply);
+                    updateHistory(base64Img, d.level);
+                    scanBtn.disabled = false;
+                    scanBtn.innerHTML = '<i class="fa-solid fa-camera"></i> BẮT ĐẦU QUẾT KHUÔN MẶT';
+                }).catch(() => {
+                    scanBtn.disabled = false;
+                    scanBtn.innerHTML = '<i class="fa-solid fa-camera"></i> BẮT ĐẦU QUẾT KHUÔN MẶT';
+                });
+            }, 1000);
         }
 
-        function loadLocalStorageScanHistory() {
-            let historyList = JSON.parse(localStorage.getItem('mindguard_history_scans')) || [];
-            renderHistoryListPanel(historyList);
-        }
-
-        function renderHistoryListPanel(list) {
-            historyPanel.innerHTML = "";
-            if(list.length === 0) {
-                historyPanel.innerHTML = `<div style="font-size:12px; color:#4b5563; text-align:center; margin-top:10px;">Chưa có dữ liệu quét</div>`;
-                return;
-            }
-            list.forEach(data => {
-                let card = document.createElement("div");
-                card.className = "history-card";
-                card.innerHTML = `
-                    <div class="history-mini-pic"><img src="${data.img}"></div>
+        function updateHistory(img, level) {
+            let statusText = level === 'Safe' ? 'An toàn' : (level === 'Warning' ? 'Áp lực / Mệt mỏi' : 'Nguy cơ cao');
+            let color = level === 'Safe' ? '#10b981' : (level === 'Warning' ? '#f59e0b' : '#ef4444');
+            
+            historyBox.innerHTML = `
+                <div class="history-card">
+                    <div class="history-pic"><img src="${img}"></div>
                     <div class="history-info">
-                        <span class="time">Lúc ${data.time}</span>
-                        <span class="status"><span class="status-dot ${data.dot}"></span> ${data.status}</span>
+                        <span style="font-size: 11px; color: #4b5563;">Vừa xong</span>
+                        <span class="status" style="color: ${color};">• ${statusText}</span>
                     </div>
-                `;
-                historyPanel.appendChild(card);
-            });
+                </div>
+            `;
         }
     </script>
 </body>
