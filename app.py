@@ -19,13 +19,6 @@ if GEMINI_API_KEY:
 else:
     print("⚠️ CẢNH BÁO: Chưa tìm thấy GEMINI_API_KEY!")
 
-# Khởi tạo model an toàn
-try:
-    model = genai.GenerativeModel('gemini-1.5-flash')
-except Exception as e:
-    print(f"Lỗi khởi tạo model: {e}")
-    model = None
-
 # ==========================================
 # HÀM GỬI CẢNH BÁO TELEGRAM
 # ==========================================
@@ -53,8 +46,8 @@ def parse_base64_image(base64_str):
     return None
 
 def get_ai_response(user_input, base64_image=None, is_scan=False):
-    if not GEMINI_API_KEY or not model:
-        return {"level": "Safe", "reply": "Chưa cấu hình GEMINI_API_KEY hoặc Model chưa sẵn sàng!"}
+    if not GEMINI_API_KEY:
+        return {"level": "Safe", "reply": "Chưa cấu hình GEMINI_API_KEY trên server!"}
 
     system_prompt = (
         "Bạn là MindGuard, chuyên gia phân tích tâm lý qua khuôn mặt.\n"
@@ -64,23 +57,29 @@ def get_ai_response(user_input, base64_image=None, is_scan=False):
         '{"level": "Safe/Warning/Danger", "reply": "Câu trả lời của bạn ở đây..."}'
     )
 
-    prompt_text = "Hãy bóc tách % cảm xúc từ ảnh này và nói chuyện với tôi." if is_scan else user_input
-    contents = [system_prompt, prompt_text]
-    
-    if base64_image:
-        img_part = parse_base64_image(base64_image)
-        if img_part:
-            contents.append(img_part)
+    # ĐỊNH DẠNG DICTIONARY CHUẨN: Giữ kết nối ở cổng v1 Stable, không bị tụt về v1beta
+    safety_settings = {
+        "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
+        "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
+        "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
+        "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
+    }
 
     try:
-        # Tắt bộ lọc an toàn để phân tích khuôn mặt không bị chặn nhầm
-        safety_settings = [
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
-        ]
+        # Khởi tạo model kèm system_instruction theo đúng chuẩn tài liệu Google AI mới nhất
+        model = genai.GenerativeModel(
+            model_name='gemini-1.5-flash',
+            system_instruction=system_prompt
+        )
         
+        prompt_text = "Hãy bóc tách % cảm xúc từ ảnh này và nói chuyện với tôi." if is_scan else user_input
+        contents = [prompt_text]
+        
+        if base64_image:
+            img_part = parse_base64_image(base64_image)
+            if img_part:
+                contents.append(img_part)
+
         response = model.generate_content(contents, safety_settings=safety_settings)
         text_resp = response.text.strip()
         
@@ -96,7 +95,7 @@ def get_ai_response(user_input, base64_image=None, is_scan=False):
         print(f"Lỗi API: {e}")
         return {
             "level": "Safe",
-            "reply": f"🚨 Hệ thống báo lỗi từ Google: {str(e)}. Hãy đảm bảo đã update thư viện ở requirements.txt!"
+            "reply": f"🚨 Hệ thống báo lỗi từ Google: {str(e)}"
         }
 
 @app.route('/')
