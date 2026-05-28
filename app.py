@@ -8,7 +8,7 @@ import google.generativeai as genai
 app = Flask(__name__)
 
 # ==========================================
-# CẤU HÌNH API KEYS VÀ BẢO MẬT
+# CẤU HÌNH API KEYS VÀ THÔNG TIN BẢO MẬT
 # ==========================================
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 TELEGRAM_TOKEN = "8561921353:AAF8mzyV6ZEIe-x3eiwJEgQX90C1pKSngFc"
@@ -20,13 +20,13 @@ else:
     print("⚠️ CẢNH BÁO: Chưa tìm thấy GEMINI_API_KEY trong Environment Variables!", flush=True)
 
 # ==========================================
-# HÀM GỬI CẢNH BÁO TELEGRAM
+# HÀM TỰ ĐỘNG GỬI TIN BÁO ĐỘNG ĐẾN TELEGRAM
 # ==========================================
 def send_alert(msg, reply, chat_id, role, student_code, student_name):
-    text = f"🚨 MINDGUARD CẢNH BÁO ({role}) 🚨\n"
-    text += f"👤 Học sinh: {student_name} (Mã: {student_code})\n"
-    text += f"💬 Tin nhắn: {msg}\n"
-    text += f"🤖 Bot phản hồi: {reply}"
+    text = f"🚨 MINDGUARD CẢNH BÁO NGUY HIỂM ({role}) 🚨\n"
+    text += f"👤 Học sinh: {student_name} (Mã số: {student_code})\n"
+    text += f"💬 Nội dung/Hành vi: {msg if msg else '[Gửi ảnh quét khuôn mặt]'}\n"
+    text += f"🤖 Nhận định của Bot: {reply}"
     
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     try:
@@ -42,25 +42,24 @@ def parse_base64_image(base64_str):
             img_bytes = base64.b64decode(base64_data)
             return {"mime_type": mime_type, "data": img_bytes}
     except Exception as e:
-        print(f"Lỗi giải mã ảnh: {e}", flush=True)
+        print(f"Lỗi giải mã ảnh base64: {e}", flush=True)
     return None
 
 # ==========================================
-# HÀM XỬ LÝ LỜI GỌI AI (GEMINI)
+# HÀM XỬ LÝ LỜI GỌI AI ĐỌC VỊ (GEMINI 2.5)
 # ==========================================
 def get_ai_response(user_input, base64_image=None, is_scan=False):
     if not GEMINI_API_KEY:
         return {"level": "Safe", "reply": "Chưa cấu hình GEMINI_API_KEY trên server!"}
 
     system_prompt = (
-        "Bạn là MindGuard, chuyên gia phân tích tâm lý qua khuôn mặt.\n"
-        "BẮT BUỘC: Nhìn ảnh và bóc tách thành các chỉ số %. VD: Vui vẻ: 20%, Áp lực: 50%, Mệt mỏi: 30%.\n"
-        "Sau đó phân tích thấu cảm.\n"
-        "TRẢ VỀ ĐÚNG CHUỖI JSON SAU:\n"
-        '{"level": "Safe/Warning/Danger", "reply": "Câu trả lời của bạn ở đây..."}'
+        "Bạn là MindGuard, chuyên gia phân tích tâm lý học đường qua tin nhắn và biểu cảm khuôn mặt học sinh.\n"
+        "Nhiệm vụ: Hãy thấu cảm, đưa ra lời khuyên nhẹ nhàng, đóng vai trò người lắng nghe đáng tin cậy.\n"
+        "Đặc biệt nếu nhận diện ảnh, hãy bóc tách ngắn gọn % các cảm xúc (Ví dụ: Vui vẻ: 10%, Lo âu: 60%, Mệt mỏi: 30%).\n"
+        "BẮT BUỘC TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU, KHÔNG THÊM CHỮ NÀO KHÁC BÊN NGOÀI:\n"
+        '{"level": "Safe/Warning/Danger", "reply": "Nội dung câu trả lời/phân tích tâm lý của bạn tại đây..."}'
     )
 
-    # ĐỊNH DẠNG DICTIONARY CHUẨN MỚI: Ép giữ kết nối ở cổng v1 Stable
     safety_settings = {
         "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
         "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
@@ -69,13 +68,13 @@ def get_ai_response(user_input, base64_image=None, is_scan=False):
     }
 
     try:
-        # Sử dụng model thế hệ mới nhất gemini-2.5-flash thay cho bản 1.5 đã bị đóng
+        # Cập nhật chính thức lên dòng Model thế hệ mới 2.5 Flash để loại bỏ lỗi 404 cũ
         model = genai.GenerativeModel(
             model_name='gemini-2.5-flash',
             system_instruction=system_prompt
         )
         
-        prompt_text = "Hãy bóc tách % cảm xúc từ ảnh này và nói chuyện với tôi." if is_scan else user_input
+        prompt_text = "Hãy bóc tách % cảm xúc qua biểu cảm khuôn mặt từ bức ảnh chụp thực tế này và trò chuyện với tôi." if is_scan else user_input
         contents = [prompt_text]
         
         if base64_image:
@@ -86,7 +85,7 @@ def get_ai_response(user_input, base64_image=None, is_scan=False):
         response = model.generate_content(contents, safety_settings=safety_settings)
         text_resp = response.text.strip()
         
-        # Bóc tách chuỗi JSON tự động
+        # Tiến hành trích xuất chuỗi cấu trúc JSON một cách an toàn
         if "{" in text_resp and "}" in text_resp:
             start = text_resp.find('{')
             end = text_resp.rfind('}') + 1
@@ -95,14 +94,23 @@ def get_ai_response(user_input, base64_image=None, is_scan=False):
             return {"level": "Safe", "reply": text_resp}
             
     except Exception as e:
-        print(f"Lỗi API Gemini: {e}", flush=True)
+        error_msg = str(e)
+        print(f"Lỗi API Gemini: {error_msg}", flush=True)
+        
+        # Giải quyết dứt điểm lỗi 429 quá tải hạn mức gói free của Google
+        if "429" in error_msg or "quota" in error_msg.lower():
+            return {
+                "level": "Warning",
+                "reply": "⏳ MindGuard đang tiếp nhận quá nhiều suy nghĩ của các bạn cùng một lúc! Bạn vui lòng thư giãn và đợi khoảng 1 phút rồi bấm trò chuyện/quét lại với mình nhé! 💙"
+            }
+            
         return {
             "level": "Safe",
-            "reply": f"🚨 Hệ thống báo lỗi từ Google: {str(e)}"
+            "reply": f"🚨 Hệ thống Google AI đang bận hoặc gặp lỗi kỹ thuật: {error_msg}"
         }
 
 # ==========================================
-# CÁC ĐƯỜNG DẪN URL (ROUTES)
+# CÁC ROUTE ĐƯỜNG DẪN URL
 # ==========================================
 @app.route('/')
 def home():
@@ -117,16 +125,16 @@ def chat():
         chat_image = data_req.get('image', None)
         is_scan = data_req.get('is_scan', False)
         
-        # Gọi AI xử lý dữ liệu
+        # Gửi dữ liệu yêu cầu xử lý qua AI
         data = get_ai_response(user_msg, base64_image=chat_image, is_scan=is_scan)
         
-        # Nếu AI cảnh báo mức độ Danger -> Kích hoạt Telegram gửi cho Giáo viên
+        # Nếu AI trả về trạng thái Danger (Nguy hiểm) -> Ngay lập tức gửi cảnh báo về Telegram giáo viên
         if data.get('level') == 'Danger':
             send_alert(user_msg, data.get('reply'), TEACHER_CHAT_ID, "Giáo viên", student_code, "Thịnh")
             
         return jsonify(data)
     except Exception as e:
-        return jsonify({"level": "Safe", "reply": f"Lỗi xử lý Server: {str(e)}"})
+        return jsonify({"level": "Safe", "reply": f"Lỗi Server xử lý dữ liệu: {str(e)}"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
