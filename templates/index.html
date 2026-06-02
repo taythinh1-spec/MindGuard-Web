@@ -9,146 +9,117 @@
     
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #3b82f6, #6366f1);
-            --bg-body: #070b14;
-            --glass-bg: rgba(15, 23, 42, 0.7);
-            --glass-panel: rgba(30, 41, 59, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            /* Tone xanh lam - lục lam tươi sáng, mang tính chữa lành */
+            --primary-gradient: linear-gradient(135deg, #3b82f6, #06b6d4);
+            --bg-body: #f0fdf4; /* Xanh pastel cực nhạt */
+            --glass-bg: rgba(255, 255, 255, 0.85); /* Kính mờ sáng */
+            --glass-panel: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-main: #1e293b; /* Xám đen đậm để dễ đọc */
+            --text-muted: #64748b; /* Xám nhạt hơn cho thông tin phụ */
             --safe-color: #10b981;
-            --sidebar-width: 280px;
+            --shadow-soft: 0 20px 40px rgba(148, 163, 184, 0.15); /* Đổ bóng mềm */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         
         body { 
-            background: radial-gradient(circle at top right, #1e1b4b, #070b14 60%);
+            background-color: #e0f2fe;
             color: var(--text-main); 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; overflow: hidden;
+            display: flex; justify-content: center; 
+            align-items: center; height: 100vh; overflow: hidden;
+            position: relative;
         }
 
-        /* KHUNG CONTAINER CHÍNH */
+        /* ----- Trang trí background sinh động ----- */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.7;
+            animation: float 8s infinite ease-in-out alternate;
+        }
+        .shape-1 {
+            width: 400px; height: 400px;
+            background: #bae6fd; /* Xanh da trời nhạt */
+            top: -10%; left: -5%;
+        }
+        .shape-2 {
+            width: 500px; height: 500px;
+            background: #ccfbf1; /* Xanh ngọc nhạt */
+            bottom: -15%; right: -10%;
+            animation-delay: -4s;
+        }
+        .shape-3 {
+            width: 300px; height: 300px;
+            background: #e0e7ff; /* Tím nhạt pastel */
+            top: 40%; left: 30%;
+            animation-duration: 12s;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(30px) scale(1.1); }
+        }
+        /* ------------------------------------------- */
+
         .app-container {
-            display: flex; flex-direction: column; 
-            width: 100%; max-width: 1200px; /* Tăng max-width để chứa sidebar */
-            height: 90vh;
-            background: var(--glass-bg); 
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border-radius: 24px; overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5); 
-            border: 1px solid var(--glass-border); position: relative;
+            display: flex; flex-direction: column; width: 100%; max-width: 900px; height: 90vh;
+            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-soft); 
+            border: 1px solid rgba(255,255,255,0.8); position: relative;
         }
 
-        /* MÀN HÌNH ĐĂNG NHẬP */
+        /* LOGIN SCREEN */
         .login-screen { 
             position: absolute; inset: 0; 
-            background: radial-gradient(circle at center, rgba(15,23,42,0.9), #070b14); 
-            z-index: 100; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; padding: 20px; 
-            transition: opacity 0.4s ease;
+            background: rgba(248, 250, 252, 0.85); backdrop-filter: blur(10px);
+            z-index: 50; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; 
+            transition: opacity 0.3s ease;
         }
         
         .login-box { 
-            background: var(--glass-panel); backdrop-filter: blur(20px);
-            padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 420px; 
-            border: 1px solid var(--glass-border); text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: floatUp 0.6s ease-out;
+            background: var(--glass-panel); padding: 40px 30px; 
+            border-radius: 24px; width: 100%; max-width: 420px; border: 1px solid var(--glass-border); 
+            text-align: center; box-shadow: 0 15px 35px rgba(51, 65, 85, 0.1); animation: floatUp 0.6s ease-out;
         }
         @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .login-box h2 { font-size: 24px; margin-bottom: 15px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .login-box h2 { font-size: 26px; margin-bottom: 12px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .login-box p { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
         
         .login-group { margin-bottom: 20px; text-align: left; }
-        .login-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500;}
+        .login-group label { display: block; font-size: 13px; color: var(--text-main); margin-bottom: 8px; font-weight: 600;}
         .login-group input { 
-            width: 100%; background: rgba(0,0,0,0.2); 
-            border: 1px solid var(--glass-border); border-radius: 12px; 
-            padding: 14px; color: var(--text-main); font-size: 15px; outline: none; transition: all 0.3s ease;
+            width: 100%; background: #ffffff; border: 1px solid #cbd5e1; 
+            border-radius: 12px; padding: 14px; color: var(--text-main); font-size: 15px; outline: none; transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
-        .login-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .login-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+        .login-group input::placeholder { color: #94a3b8; }
         
         .btn-login { 
-            width: 100%; background: var(--primary-gradient); color: white; 
-            border: none; padding: 16px; border-radius: 12px; font-weight: 600; 
-            cursor: pointer; margin-top: 10px; font-size: 15px; transition: transform 0.2s, box-shadow 0.2s; 
+            width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 16px; 
+            border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 15px; 
+            transition: transform 0.2s, box-shadow 0.2s; 
         }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25); }
 
-        /* BỐ CỤC CHAT (SIDEBAR + MAIN) */
-        .chat-ui-wrapper { display: none; flex-direction: row; height: 100%; width: 100%; }
+        /* CHAT UI */
+        .chat-ui-wrapper { display: none; flex-direction: column; height: 100%; }
         
-        /* SIDEBAR (BẢNG ĐIỀU KHIỂN BÊN TRÁI) */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: rgba(10, 15, 30, 0.5);
-            border-right: 1px solid var(--glass-border);
-            display: flex; flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-
-        .user-profile {
-            padding: 30px 20px 20px; border-bottom: 1px solid var(--glass-border);
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-        }
-
-        .avatar-container {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: var(--glass-panel); border: 2px solid var(--glass-border);
-            margin-bottom: 15px; position: relative;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 32px; color: var(--text-muted); cursor: pointer;
-            overflow: hidden;
-        }
-        
-        .avatar-container img { width: 100%; height: 100%; object-fit: cover; display: none; }
-        
-        .avatar-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.6);
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.2s; font-size: 20px; color: white;
-        }
-        .avatar-container:hover .avatar-overlay { opacity: 1; }
-
-        .user-profile h3 { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
-        .user-profile p { font-size: 13px; color: var(--text-muted); background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 20px;}
-
-        .chat-history { flex: 1; padding: 20px 10px; overflow-y: auto; }
-        .chat-history h4 { font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; padding-left: 10px; letter-spacing: 0.5px; }
-        .history-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-        .history-list li {
-            padding: 12px 15px; border-radius: 10px;
-            display: flex; align-items: center; gap: 10px;
-            font-size: 14px; color: var(--text-main); cursor: pointer;
-            transition: background 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .history-list li:hover { background: var(--glass-panel); }
-        .history-list li.active { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-
-        /* KHU VỰC MAIN CHAT */
-        .chat-main { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
-
         .chat-header { 
-            padding: 20px; background: rgba(15, 23, 42, 0.4); 
-            border-bottom: 1px solid var(--glass-border); 
+            padding: 20px 24px; background: rgba(255, 255, 255, 0.7); border-bottom: 1px solid #e2e8f0; 
             display: flex; align-items: center; justify-content: space-between; 
         }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
-        
-        .header-left h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.5px;}
-        .status-dot { font-size: 12px; color: var(--safe-color); display: flex; align-items: center; gap: 6px; }
+        .header-left h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px; color: var(--text-main); }
+        .status-dot { font-size: 12px; color: var(--safe-color); display: flex; align-items: center; gap: 6px; font-weight: 500;}
         
         .chat-messages { 
-            flex: 1; padding: 24px; overflow-y: auto; 
-            display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth;
+            flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth;
         }
-        
-        /* Tùy chỉnh thanh cuộn */
-        .chat-messages::-webkit-scrollbar, .chat-history::-webkit-scrollbar { width: 6px; }
-        .chat-messages::-webkit-scrollbar-thumb, .chat-history::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
         .message { display: flex; gap: 14px; max-width: 85%; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -158,67 +129,53 @@
         
         .avatar { 
             width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            overflow: hidden;
+            justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .bot .avatar { background: var(--primary-gradient); color: white; }
-        .user .avatar { background: var(--glass-panel); border: 1px solid var(--glass-border); color: var(--text-muted); }
+        .user .avatar { background: white; border: 1px solid #e2e8f0; color: #3b82f6; }
         
         .message-info { display: flex; flex-direction: column; gap: 6px; max-width: 100%; }
-        .sender-name { font-size: 13px; color: var(--text-muted); margin-bottom: 2px; }
+        .sender-name { font-size: 13px; color: var(--text-muted); margin-bottom: 2px; font-weight: 600; }
         .user .sender-name { text-align: right; }
         
         .message-content { 
-            padding: 14px 18px; border-radius: 18px; font-size: 15px; 
-            line-height: 1.6; word-break: break-word; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 14px 18px; border-radius: 18px; font-size: 15px; line-height: 1.6; word-break: break-word; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        .bot .message-content { background: var(--glass-panel); border: 1px solid var(--glass-border); border-top-left-radius: 4px; }
+        .bot .message-content { background: white; border: 1px solid #e2e8f0; border-top-left-radius: 4px; color: var(--text-main); }
         .user .message-content { background: var(--primary-gradient); color: #ffffff; border-top-right-radius: 4px; }
         
         .btn-play-voice {
-            background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.4);
-            color: #60a5fa; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
-            cursor: pointer; margin-top: 10px; display: inline-flex; align-items: center; gap: 8px;
-            transition: all 0.3s ease; align-self: flex-start;
+            background: #f1f5f9; border: 1px solid #e2e8f0; color: #0ea5e9;
+            padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;
+            margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; align-self: flex-start;
         }
-        .btn-play-voice:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
-        .btn-play-voice.playing { background: var(--primary-gradient); color: white; border: none; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); animation: pulsePlay 1.5s infinite; }
-        @keyframes pulsePlay { 0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.7); } 70% { box-shadow: 0 0 0 10px rgba(59,130,246,0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); } }
+        .btn-play-voice:hover { background: #e0f2fe; color: #0284c7; border-color: #bae6fd; }
+        .btn-play-voice.playing {
+            background: var(--primary-gradient); color: white; border: none; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); animation: pulsePlay 1.5s infinite;
+        }
+        @keyframes pulsePlay { 0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); } 70% { box-shadow: 0 0 0 10px rgba(59,130,246,0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); } }
 
         .chat-input-area { 
-            padding: 20px; background: rgba(15, 23, 42, 0.5); border-top: 1px solid var(--glass-border); 
-            display: flex; gap: 12px; align-items: center; 
+            padding: 20px 24px; background: rgba(255, 255, 255, 0.8); border-top: 1px solid #e2e8f0; display: flex; gap: 12px; align-items: center; 
         }
         .chat-input-area input { 
-            flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); 
-            border-radius: 24px; padding: 15px 24px; color: var(--text-main); 
-            font-size: 15px; outline: none; transition: all 0.3s ease;
+            flex: 1; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 24px; padding: 15px 24px; color: var(--text-main); font-size: 15px; outline: none; transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
-        .chat-input-area input:focus { background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.2); }
+        .chat-input-area input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+        .chat-input-area input::placeholder { color: #94a3b8; }
+        
         .chat-input-area button { 
-            background: var(--primary-gradient); border: none; color: white; 
-            width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 18px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            background: var(--primary-gradient); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; font-size: 18px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
         .chat-input-area button:hover { transform: scale(1.05); }
 
-        /* THIẾT KẾ ĐÁP ỨNG CHO ĐIỆN THOẠI (MOBILE) */
-        .sidebar-overlay {
-            display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 40;
-        }
         @media (max-width: 768px) {
-            body { padding: 0; background: #070b14; }
-            .app-container { height: 100dvh; max-width: 100%; border-radius: 0; border: none; }
-            .login-box { border-radius: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 20px;}
-            
-            /* Xử lý Sidebar trên Mobile */
-            .sidebar { position: absolute; left: 0; top: 0; bottom: 0; z-index: 50; background: var(--bg-body); transform: translateX(-100%); }
-            .sidebar.active { transform: translateX(0); }
-            .sidebar-overlay.active { display: block; }
-            .menu-toggle { display: block; }
-            
+            body { padding: 0; }
+            .bg-shape { display: none; } /* Tắt shape trên mobile để tối ưu hiệu năng */
+            .app-container { height: 100vh; height: 100dvh; max-width: 100%; border-radius: 0; border: none; }
+            .login-box { border-radius: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 20px; box-shadow: none; background: rgba(255,255,255,0.95);}
             .message { max-width: 95%; }
             .chat-messages { padding: 16px; gap: 16px; }
             .message-content { font-size: 14px; padding: 12px 16px; }
@@ -231,9 +188,11 @@
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
 
+    <div class="app-container">
         <div class="login-screen" id="loginScreen">
             <div class="login-box">
                 <h2><i class="fa-solid fa-shield-halved"></i> MindGuard</h2>
@@ -243,54 +202,26 @@
                     <input type="text" id="initName" placeholder="Ví dụ: Hoàng Đức" onkeypress="if(event.key==='Enter') startSystem()">
                 </div>
                 <div class="login-group">
-                    <label>Mã Token ID (Dạng số)</label>
-                    <input type="number" id="initTokenId" placeholder="Ví dụ: 7498394" onkeypress="if(event.key==='Enter') startSystem()">
+                    <label>Mã Token (Chat ID Telegram)</label>
+                    <input type="number" id="initTokenId" placeholder="Ví dụ: 5871531291" onkeypress="if(event.key==='Enter') startSystem()">
                 </div>
                 <button class="btn-login" onclick="startSystem()">BẮT ĐẦU TRÒ CHUYỆN</button>
             </div>
         </div>
 
         <div class="chat-ui-wrapper" id="chatUiWrapper">
-            
-            <div class="sidebar" id="sidebar">
-                <div class="user-profile">
-                    <label for="avatarUpload" class="avatar-container">
-                        <i class="fa-solid fa-user" id="defaultAvatarIcon"></i>
-                        <img id="sidebarAvatarImg" src="" alt="Avatar">
-                        <div class="avatar-overlay"><i class="fa-solid fa-camera"></i></div>
-                    </label>
-                    <input type="file" id="avatarUpload" accept="image/*" hidden>
-                    
-                    <h3 id="sidebarUserName">User Name</h3>
-                    <p id="sidebarTokenId">Token: XXXXX</p>
-                </div>
-                <div class="chat-history">
-                    <h4>Lịch sử</h4>
-                    <ul class="history-list" id="historyList">
-                        <li class="active"><i class="fa-regular fa-message"></i> Phiên trò chuyện hiện tại</li>
-                        <li><i class="fa-regular fa-message"></i> Suy nghĩ ngày hôm qua</li>
-                        <li><i class="fa-regular fa-message"></i> Áp lực công việc</li>
-                    </ul>
+            <div class="chat-header">
+                <div class="header-left">
+                    <h1>MindGuard AI</h1>
+                    <div class="status-dot"><i class="fa-solid fa-circle"></i> Trực tuyến</div>
                 </div>
             </div>
 
-            <div class="chat-main">
-                <div class="chat-header">
-                    <div class="header-left">
-                        <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-                        <div>
-                            <h1>MindGuard AI</h1>
-                            <div class="status-dot"><i class="fa-solid fa-circle"></i> Trực tuyến</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="chat-messages" id="chatContainer"></div>
 
-                <div class="chat-messages" id="chatContainer"></div>
-
-                <div class="chat-input-area">
-                    <input type="text" id="userInput" placeholder="Nhắn tin cho MindGuard..." autocomplete="off" onkeypress="if(event.key==='Enter') sendTextMessage()">
-                    <button onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-                </div>
+            <div class="chat-input-area">
+                <input type="text" id="userInput" placeholder="Nhắn tin cho MindGuard..." autocomplete="off" onkeypress="if(event.key==='Enter') sendTextMessage()">
+                <button onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
@@ -299,39 +230,9 @@
         const loginScreen = document.getElementById('loginScreen');
         const chatUiWrapper = document.getElementById('chatUiWrapper');
         const chatContainer = document.getElementById('chatContainer');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
         
-        let userInfo = { name: "", tokenId: "", avatarDataUrl: null };
+        let userInfo = { name: "", tokenId: "" };
 
-        // 1. Xử lý Toggle Sidebar (Mobile)
-        function toggleSidebar() {
-            sidebar.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-        }
-
-        // 2. Xử lý tải lên Avatar
-        document.getElementById('avatarUpload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    userInfo.avatarDataUrl = event.target.result;
-                    // Cập nhật ở Sidebar
-                    document.getElementById('sidebarAvatarImg').src = userInfo.avatarDataUrl;
-                    document.getElementById('sidebarAvatarImg').style.display = 'block';
-                    document.getElementById('defaultAvatarIcon').style.display = 'none';
-                    
-                    // Cập nhật tất cả các avatar trong đoạn chat hiện tại
-                    document.querySelectorAll('.message.user .avatar').forEach(av => {
-                        av.innerHTML = `<img src="${userInfo.avatarDataUrl}" alt="Avatar">`;
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // 3. Khởi động và Đăng nhập
         function startSystem() {
             const nameInput = document.getElementById('initName').value.trim();
             const tokenInput = document.getElementById('initTokenId').value.trim();
@@ -340,11 +241,6 @@
             userInfo.name = nameInput;
             userInfo.tokenId = tokenInput;
 
-            // Cập nhật thông tin vào Sidebar
-            document.getElementById('sidebarUserName').innerText = userInfo.name;
-            document.getElementById('sidebarTokenId').innerText = `Token: ${userInfo.tokenId}`;
-
-            // Hiệu ứng mờ dần màn hình login
             loginScreen.style.opacity = '0';
             setTimeout(() => {
                 loginScreen.style.display = 'none';
@@ -353,7 +249,6 @@
             }, 300);
         }
 
-        // 4. Chức năng Đọc tin nhắn (Phát từng tin)
         function playVoiceMessage(textId, btnElement) {
             if (!('speechSynthesis' in window)) {
                 alert("Rất tiếc, trình duyệt của bạn không hỗ trợ chức năng đọc giọng nói.");
@@ -383,11 +278,9 @@
                 btnElement.innerHTML = '<i class="fa-solid fa-play"></i> Nghe tin nhắn';
                 btnElement.classList.remove('playing');
             };
-
             window.speechSynthesis.speak(utterance);
         }
 
-        // 5. Hiển thị tin nhắn
         function scrollToBottom() { chatContainer.scrollTop = chatContainer.scrollHeight; }
 
         function appendMessage(text, sender) {
@@ -396,23 +289,17 @@
             
             const textId = 'msg-text-' + Date.now() + Math.floor(Math.random() * 100);
 
-            // Kiểm tra avatar: Nếu là User và có ảnh thì dùng thẻ img, nếu không dùng icon
-            let userAvatarContent = userInfo.avatarDataUrl 
-                ? `<img src="${userInfo.avatarDataUrl}" alt="Avatar">` 
-                : `<i class="fa-solid fa-user"></i>`;
-
             let avatarHtml = sender === 'bot' 
                 ? `<div class="avatar"><i class="fa-solid fa-leaf"></i></div>` 
-                : `<div class="avatar">${userAvatarContent}</div>`;
+                : `<div class="avatar"><i class="fa-solid fa-user"></i></div>`;
             
             let nameHtml = sender === 'bot' 
                 ? `<span class="sender-name">MindGuard</span>` 
-                : `<span class="sender-name">Bạn</span>`;
+                : `<span class="sender-name">${userInfo.name}</span>`;
 
             let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
 
-            let contentHtml = `<div class="message-content">
-                                   <div id="${textId}">${formattedText}</div>`;
+            let contentHtml = `<div class="message-content"><div id="${textId}">${formattedText}</div>`;
             
             if (sender === 'bot') {
                 contentHtml += `<button class="btn-play-voice" onclick="playVoiceMessage('${textId}', this)">
@@ -421,13 +308,7 @@
             }
             contentHtml += `</div>`;
 
-            msgDiv.innerHTML = `
-                ${avatarHtml}
-                <div class="message-info">
-                    ${nameHtml}
-                    ${contentHtml}
-                </div>
-            `;
+            msgDiv.innerHTML = `${avatarHtml}<div class="message-info">${nameHtml}${contentHtml}</div>`;
             chatContainer.appendChild(msgDiv);
             scrollToBottom();
         }
@@ -445,7 +326,6 @@
         }
         function removeLoadingBot() { const loadDiv = document.getElementById('botLoadingTemp'); if (loadDiv) loadDiv.remove(); }
 
-        // 6. Gửi dữ liệu tới Python Backend
         async function sendTextMessage() {
             const input = document.getElementById('userInput');
             const message = input.value.trim();
@@ -472,7 +352,7 @@
 
             } catch (err) {
                 removeLoadingBot();
-                appendMessage("❌ Máy chủ đang bận hoặc không phản hồi. Xin lưu ý đây là giao diện Demo chưa kết nối Backend Python thực tế.", 'bot');
+                appendMessage("❌ Máy chủ đang bận hoặc không phản hồi. Bạn vui lòng thử lại sau nhé.", 'bot');
             }
         }
     </script>
