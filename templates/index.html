@@ -17,6 +17,7 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --safe-color: #10b981;
+            --sidebar-width: 280px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -24,43 +25,36 @@
         body { 
             background: radial-gradient(circle at top right, #1e1b4b, #070b14 60%);
             color: var(--text-main); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            overflow: hidden;
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; overflow: hidden;
         }
 
         /* KHUNG CONTAINER CHÍNH */
         .app-container {
             display: flex; flex-direction: column; 
-            width: 100%; max-width: 900px; height: 90vh;
+            width: 100%; max-width: 1200px; /* Tăng max-width để chứa sidebar */
+            height: 90vh;
             background: var(--glass-bg); 
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 24px; 
-            overflow: hidden;
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px; overflow: hidden;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5); 
-            border: 1px solid var(--glass-border); 
-            position: relative;
+            border: 1px solid var(--glass-border); position: relative;
         }
 
         /* MÀN HÌNH ĐĂNG NHẬP */
         .login-screen { 
             position: absolute; inset: 0; 
             background: radial-gradient(circle at center, rgba(15,23,42,0.9), #070b14); 
-            z-index: 50; display: flex; flex-direction: column; 
+            z-index: 100; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; padding: 20px; 
+            transition: opacity 0.4s ease;
         }
         
         .login-box { 
             background: var(--glass-panel); backdrop-filter: blur(20px);
-            padding: 40px 30px; border-radius: 20px; 
-            width: 100%; max-width: 420px; 
-            border: 1px solid var(--glass-border); 
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: floatUp 0.6s ease-out;
+            padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 420px; 
+            border: 1px solid var(--glass-border); text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: floatUp 0.6s ease-out;
         }
         @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -79,31 +73,82 @@
         .btn-login { 
             width: 100%; background: var(--primary-gradient); color: white; 
             border: none; padding: 16px; border-radius: 12px; font-weight: 600; 
-            cursor: pointer; margin-top: 10px; font-size: 15px; 
-            transition: transform 0.2s, box-shadow 0.2s; 
+            cursor: pointer; margin-top: 10px; font-size: 15px; transition: transform 0.2s, box-shadow 0.2s; 
         }
         .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
 
-        /* GIAO DIỆN CHAT */
-        .chat-ui-wrapper { display: none; flex-direction: column; height: 100%; }
+        /* BỐ CỤC CHAT (SIDEBAR + MAIN) */
+        .chat-ui-wrapper { display: none; flex-direction: row; height: 100%; width: 100%; }
         
+        /* SIDEBAR (BẢNG ĐIỀU KHIỂN BÊN TRÁI) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(10, 15, 30, 0.5);
+            border-right: 1px solid var(--glass-border);
+            display: flex; flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .user-profile {
+            padding: 30px 20px 20px; border-bottom: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+
+        .avatar-container {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: var(--glass-panel); border: 2px solid var(--glass-border);
+            margin-bottom: 15px; position: relative;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 32px; color: var(--text-muted); cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .avatar-container img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        
+        .avatar-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.2s; font-size: 20px; color: white;
+        }
+        .avatar-container:hover .avatar-overlay { opacity: 1; }
+
+        .user-profile h3 { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+        .user-profile p { font-size: 13px; color: var(--text-muted); background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 20px;}
+
+        .chat-history { flex: 1; padding: 20px 10px; overflow-y: auto; }
+        .chat-history h4 { font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; padding-left: 10px; letter-spacing: 0.5px; }
+        .history-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .history-list li {
+            padding: 12px 15px; border-radius: 10px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 14px; color: var(--text-main); cursor: pointer;
+            transition: background 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .history-list li:hover { background: var(--glass-panel); }
+        .history-list li.active { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+        /* KHU VỰC MAIN CHAT */
+        .chat-main { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+
         .chat-header { 
             padding: 20px; background: rgba(15, 23, 42, 0.4); 
             border-bottom: 1px solid var(--glass-border); 
             display: flex; align-items: center; justify-content: space-between; 
         }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+        
         .header-left h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.5px;}
         .status-dot { font-size: 12px; color: var(--safe-color); display: flex; align-items: center; gap: 6px; }
         
         .chat-messages { 
             flex: 1; padding: 24px; overflow-y: auto; 
-            display: flex; flex-direction: column; gap: 24px; 
-            scroll-behavior: smooth;
+            display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth;
         }
         
-        /* Tùy chỉnh thanh cuộn (Scrollbar) */
-        .chat-messages::-webkit-scrollbar { width: 6px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        /* Tùy chỉnh thanh cuộn */
+        .chat-messages::-webkit-scrollbar, .chat-history::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-thumb, .chat-history::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         
         .message { display: flex; gap: 14px; max-width: 85%; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -114,7 +159,9 @@
         .avatar { 
             width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; 
             justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .bot .avatar { background: var(--primary-gradient); color: white; }
         .user .avatar { background: var(--glass-panel); border: 1px solid var(--glass-border); color: var(--text-muted); }
         
@@ -129,32 +176,18 @@
         .bot .message-content { background: var(--glass-panel); border: 1px solid var(--glass-border); border-top-left-radius: 4px; }
         .user .message-content { background: var(--primary-gradient); color: #ffffff; border-top-right-radius: 4px; }
         
-        /* NÚT PLAY GIỌNG NÓI */
         .btn-play-voice {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            color: #60a5fa;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 12px; font-weight: 500;
-            cursor: pointer;
-            margin-top: 10px;
-            display: inline-flex; align-items: center; gap: 8px;
-            transition: all 0.3s ease;
-            align-self: flex-start;
+            background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #60a5fa; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+            cursor: pointer; margin-top: 10px; display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.3s ease; align-self: flex-start;
         }
         .btn-play-voice:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
-        .btn-play-voice.playing {
-            background: var(--primary-gradient); color: white; border: none;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-            animation: pulsePlay 1.5s infinite;
-        }
+        .btn-play-voice.playing { background: var(--primary-gradient); color: white; border: none; box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); animation: pulsePlay 1.5s infinite; }
         @keyframes pulsePlay { 0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.7); } 70% { box-shadow: 0 0 0 10px rgba(59,130,246,0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); } }
 
-        /* KHU VỰC NHẬP TIN NHẮN */
         .chat-input-area { 
-            padding: 20px; background: rgba(15, 23, 42, 0.5); 
-            border-top: 1px solid var(--glass-border); 
+            padding: 20px; background: rgba(15, 23, 42, 0.5); border-top: 1px solid var(--glass-border); 
             display: flex; gap: 12px; align-items: center; 
         }
         .chat-input-area input { 
@@ -167,21 +200,25 @@
             background: var(--primary-gradient); border: none; color: white; 
             width: 50px; height: 50px; border-radius: 50%; cursor: pointer; 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 18px; transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            font-size: 18px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
         .chat-input-area button:hover { transform: scale(1.05); }
 
-        /* =========================================
-           THIẾT KẾ ĐÁP ỨNG CHO ĐIỆN THOẠI (MOBILE)
-           ========================================= */
+        /* THIẾT KẾ ĐÁP ỨNG CHO ĐIỆN THOẠI (MOBILE) */
+        .sidebar-overlay {
+            display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 40;
+        }
         @media (max-width: 768px) {
             body { padding: 0; background: #070b14; }
-            .app-container { 
-                height: 100vh; height: 100dvh; /* Hỗ trợ iOS safari mượt hơn */
-                max-width: 100%; border-radius: 0; border: none; 
-            }
+            .app-container { height: 100dvh; max-width: 100%; border-radius: 0; border: none; }
             .login-box { border-radius: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 20px;}
+            
+            /* Xử lý Sidebar trên Mobile */
+            .sidebar { position: absolute; left: 0; top: 0; bottom: 0; z-index: 50; background: var(--bg-body); transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .menu-toggle { display: block; }
+            
             .message { max-width: 95%; }
             .chat-messages { padding: 16px; gap: 16px; }
             .message-content { font-size: 14px; padding: 12px 16px; }
@@ -195,6 +232,8 @@
 <body>
 
     <div class="app-container">
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
         <div class="login-screen" id="loginScreen">
             <div class="login-box">
                 <h2><i class="fa-solid fa-shield-halved"></i> MindGuard</h2>
@@ -212,18 +251,46 @@
         </div>
 
         <div class="chat-ui-wrapper" id="chatUiWrapper">
-            <div class="chat-header">
-                <div class="header-left">
-                    <h1>MindGuard AI</h1>
-                    <div class="status-dot"><i class="fa-solid fa-circle"></i> Trực tuyến</div>
+            
+            <div class="sidebar" id="sidebar">
+                <div class="user-profile">
+                    <label for="avatarUpload" class="avatar-container">
+                        <i class="fa-solid fa-user" id="defaultAvatarIcon"></i>
+                        <img id="sidebarAvatarImg" src="" alt="Avatar">
+                        <div class="avatar-overlay"><i class="fa-solid fa-camera"></i></div>
+                    </label>
+                    <input type="file" id="avatarUpload" accept="image/*" hidden>
+                    
+                    <h3 id="sidebarUserName">User Name</h3>
+                    <p id="sidebarTokenId">Token: XXXXX</p>
+                </div>
+                <div class="chat-history">
+                    <h4>Lịch sử</h4>
+                    <ul class="history-list" id="historyList">
+                        <li class="active"><i class="fa-regular fa-message"></i> Phiên trò chuyện hiện tại</li>
+                        <li><i class="fa-regular fa-message"></i> Suy nghĩ ngày hôm qua</li>
+                        <li><i class="fa-regular fa-message"></i> Áp lực công việc</li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="chat-messages" id="chatContainer"></div>
+            <div class="chat-main">
+                <div class="chat-header">
+                    <div class="header-left">
+                        <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                        <div>
+                            <h1>MindGuard AI</h1>
+                            <div class="status-dot"><i class="fa-solid fa-circle"></i> Trực tuyến</div>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="chat-input-area">
-                <input type="text" id="userInput" placeholder="Nhắn tin cho MindGuard..." autocomplete="off" onkeypress="if(event.key==='Enter') sendTextMessage()">
-                <button onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                <div class="chat-messages" id="chatContainer"></div>
+
+                <div class="chat-input-area">
+                    <input type="text" id="userInput" placeholder="Nhắn tin cho MindGuard..." autocomplete="off" onkeypress="if(event.key==='Enter') sendTextMessage()">
+                    <button onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
             </div>
         </div>
     </div>
@@ -232,10 +299,39 @@
         const loginScreen = document.getElementById('loginScreen');
         const chatUiWrapper = document.getElementById('chatUiWrapper');
         const chatContainer = document.getElementById('chatContainer');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
         
-        let userInfo = { name: "", tokenId: "" };
+        let userInfo = { name: "", tokenId: "", avatarDataUrl: null };
 
-        // 1. Khởi động và Đăng nhập
+        // 1. Xử lý Toggle Sidebar (Mobile)
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        // 2. Xử lý tải lên Avatar
+        document.getElementById('avatarUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    userInfo.avatarDataUrl = event.target.result;
+                    // Cập nhật ở Sidebar
+                    document.getElementById('sidebarAvatarImg').src = userInfo.avatarDataUrl;
+                    document.getElementById('sidebarAvatarImg').style.display = 'block';
+                    document.getElementById('defaultAvatarIcon').style.display = 'none';
+                    
+                    // Cập nhật tất cả các avatar trong đoạn chat hiện tại
+                    document.querySelectorAll('.message.user .avatar').forEach(av => {
+                        av.innerHTML = `<img src="${userInfo.avatarDataUrl}" alt="Avatar">`;
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 3. Khởi động và Đăng nhập
         function startSystem() {
             const nameInput = document.getElementById('initName').value.trim();
             const tokenInput = document.getElementById('initTokenId').value.trim();
@@ -243,6 +339,10 @@
 
             userInfo.name = nameInput;
             userInfo.tokenId = tokenInput;
+
+            // Cập nhật thông tin vào Sidebar
+            document.getElementById('sidebarUserName').innerText = userInfo.name;
+            document.getElementById('sidebarTokenId').innerText = `Token: ${userInfo.tokenId}`;
 
             // Hiệu ứng mờ dần màn hình login
             loginScreen.style.opacity = '0';
@@ -253,7 +353,7 @@
             }, 300);
         }
 
-        // 2. Chức năng Đọc tin nhắn (Phát từng tin)
+        // 4. Chức năng Đọc tin nhắn (Phát từng tin)
         function playVoiceMessage(textId, btnElement) {
             if (!('speechSynthesis' in window)) {
                 alert("Rất tiếc, trình duyệt của bạn không hỗ trợ chức năng đọc giọng nói.");
@@ -266,7 +366,6 @@
                     b.innerHTML = '<i class="fa-solid fa-play"></i> Nghe tin nhắn';
                     b.classList.remove('playing');
                 });
-                
                 if (btnElement.classList.contains('playing')) return;
             }
 
@@ -288,7 +387,7 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // 3. Hiển thị tin nhắn
+        // 5. Hiển thị tin nhắn
         function scrollToBottom() { chatContainer.scrollTop = chatContainer.scrollHeight; }
 
         function appendMessage(text, sender) {
@@ -297,13 +396,18 @@
             
             const textId = 'msg-text-' + Date.now() + Math.floor(Math.random() * 100);
 
+            // Kiểm tra avatar: Nếu là User và có ảnh thì dùng thẻ img, nếu không dùng icon
+            let userAvatarContent = userInfo.avatarDataUrl 
+                ? `<img src="${userInfo.avatarDataUrl}" alt="Avatar">` 
+                : `<i class="fa-solid fa-user"></i>`;
+
             let avatarHtml = sender === 'bot' 
                 ? `<div class="avatar"><i class="fa-solid fa-leaf"></i></div>` 
-                : `<div class="avatar"><i class="fa-solid fa-user"></i></div>`;
+                : `<div class="avatar">${userAvatarContent}</div>`;
             
             let nameHtml = sender === 'bot' 
                 ? `<span class="sender-name">MindGuard</span>` 
-                : `<span class="sender-name">${userInfo.name} (Token: ${userInfo.tokenId})</span>`;
+                : `<span class="sender-name">Bạn</span>`;
 
             let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
 
@@ -341,7 +445,7 @@
         }
         function removeLoadingBot() { const loadDiv = document.getElementById('botLoadingTemp'); if (loadDiv) loadDiv.remove(); }
 
-        // 4. Gửi dữ liệu tới Python Backend
+        // 6. Gửi dữ liệu tới Python Backend
         async function sendTextMessage() {
             const input = document.getElementById('userInput');
             const message = input.value.trim();
@@ -368,7 +472,7 @@
 
             } catch (err) {
                 removeLoadingBot();
-                appendMessage("❌ Máy chủ đang bận hoặc không phản hồi. Bạn vui lòng thử lại sau nhé.", 'bot');
+                appendMessage("❌ Máy chủ đang bận hoặc không phản hồi. Xin lưu ý đây là giao diện Demo chưa kết nối Backend Python thực tế.", 'bot');
             }
         }
     </script>
