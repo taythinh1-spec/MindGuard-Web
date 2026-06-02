@@ -11,7 +11,6 @@ app = Flask(__name__)
 # ==========================================
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 TELEGRAM_TOKEN = "8561921353:AAF8mzyV6ZEIe-x3eiwJEgQX90C1pKSngFc"
-TEACHER_CHAT_ID = "5871531291"
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
@@ -21,9 +20,9 @@ else:
 # ==========================================
 # HÀM TỰ ĐỘNG GỬI TIN BÁO ĐỘNG ĐẾN TELEGRAM
 # ==========================================
-def send_alert(msg, reply, chat_id, role, ig_id, student_name):
+def send_alert(msg, reply, chat_id, role, token_id, student_name):
     text = f"🚨 MINDGUARD CẢNH BÁO NGUY HIỂM ({role}) 🚨\n"
-    text += f"👤 Học sinh: {student_name} (IG: {ig_id})\n"
+    text += f"👤 Học sinh: {student_name} (Mã Chat ID: {token_id})\n"
     text += f"💬 Tin nhắn: {msg}\n"
     text += f"🤖 Phân tích của Bot: {reply}"
     
@@ -36,14 +35,14 @@ def send_alert(msg, reply, chat_id, role, ig_id, student_name):
 # ==========================================
 # HÀM XỬ LÝ LỜI GỌI AI ĐỌC VỊ (GEMINI 2.5 FLASH)
 # ==========================================
-def get_ai_response(user_input, user_name, ig_id):
+def get_ai_response(user_input, user_name, token_id):
     if not GEMINI_API_KEY:
         return {"level": "Safe", "reply": "Chưa cấu hình GEMINI_API_KEY trên server!"}
 
-    # Cập nhật System Prompt để AI nói ngắn gọn, thấu cảm, bớt máy móc
+    # System Prompt: Ngắn gọn, thấu cảm, xưng hô bằng Tên và ghi nhận Token ID
     system_prompt = (
         f"Bạn là MindGuard, một người bạn tâm giao và trợ lý tâm lý học đường.\n"
-        f"Người đang trò chuyện với bạn tên là {user_name} (ID Instagram: {ig_id}).\n"
+        f"Người đang trò chuyện với bạn tên là {user_name} (Mã Token ID: {token_id}).\n"
         "Quy tắc CỐT LÕI:\n"
         "1. Trả lời cực kỳ NGẮN GỌN (tối đa 2-3 câu). Tuyệt đối không dài dòng.\n"
         "2. KHÔNG khuyên răn đạo lý, KHÔNG dùng các từ sáo rỗng như 'hãy cố lên', 'mọi chuyện sẽ ổn'.\n"
@@ -106,14 +105,13 @@ def chat():
         data_req = request.json or {}
         user_msg = data_req.get('message', '')
         user_name = data_req.get('user_name', 'Bạn ẩn danh')
-        ig_id = data_req.get('ig_id', 'Không rõ')
+        token_id = data_req.get('token_id', '000000') 
         
-        # Gửi dữ liệu yêu cầu xử lý qua AI
-        data = get_ai_response(user_msg, user_name, ig_id)
+        data = get_ai_response(user_msg, user_name, token_id)
         
-        # Báo động Telegram nếu có rủi ro
+        # Gửi cảnh báo trực tiếp về mã token_id (Chat ID Telegram) mà người dùng đã nhập
         if data.get('level') == 'Danger':
-            send_alert(user_msg, data.get('reply'), TEACHER_CHAT_ID, "Giáo viên", ig_id, user_name)
+            send_alert(user_msg, data.get('reply'), token_id, "Người dùng/Giáo viên", token_id, user_name)
             
         return jsonify(data)
     except Exception as e:
