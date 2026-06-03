@@ -4,336 +4,339 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindGuard AI — Trợ lý tâm lý</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { 
-            display: flex; height: 100vh; background: linear-gradient(135deg, #eef5f9 0%, #dbe7f2 100%); 
-            justify-content: center; align-items: center; overflow: hidden; 
-        }
+        body { display: flex; height: 100vh; background-color: #f0f4f8; overflow: hidden; position: relative; }
         
-        /* App Container Bo Tròn Giống Ảnh Mẫu */
-        .app-window {
-            display: flex; width: 92vw; height: 88vh; background: #fff; 
-            border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.08); overflow: hidden;
-        }
-
-        /* Sidebar Sáng Màu */
+        /* -----------------------------------------
+           SIDEBAR (THANH BÊN TRÁI)
+        ----------------------------------------- */
         .sidebar { 
-            width: 280px; background-color: #f8fafc; padding: 24px; 
-            display: flex; flex-direction: column; gap: 20px; border-right: 1px solid #e2e8f0; 
+            width: 280px; 
+            background-color: #ffffff; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            border-right: 1px solid #e1e4e8;
+            transition: transform 0.3s ease;
+            z-index: 999;
         }
+        .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
+        .logo-icon { width: 30px; height: 30px; background: #1da1f2; color: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; }
+        .logo-text { font-size: 22px; font-weight: bold; color: #1da1f2; }
         
-        /* --- HIỆU ỨNG MASCOT MÈO CHẠY ĐỘNG --- */
-        .logo-container {
+        .new-chat-btn { 
+            padding: 12px; 
+            background: white; 
+            border: 1px solid #e1e4e8; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 500;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 8px; 
+            margin-bottom: 25px; 
+            transition: 0.2s; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .new-chat-btn:hover { background: #f7f9fa; border-color: #b4dbf7; }
+        
+        .history-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .history-list { flex: 1; overflow-y: auto; }
+        .history-item { 
+            padding: 12px; 
+            background: #e8f5fd; 
+            border-radius: 10px; 
+            font-size: 14px; 
+            color: #1da1f2; 
+            font-weight: 500;
+            cursor: pointer; 
+            margin-bottom: 8px; 
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
+            gap: 8px;
         }
-        .running-mascot {
-            width: 64px; 
-            height: 64px; 
-            background-image: url('image_0.png');
-            background-repeat: no-repeat;
-            background-size: auto 100%;
-            animation: play-friendly-mascot 0.7s steps(8) infinite;
-            image-rendering: pixelated; 
-        }
-        .logo-text { font-size: 22px; font-weight: bold; color: #1e88e5; }
-        @keyframes play-friendly-mascot {
-            from { background-position: 0px; }
-            to { background-position: -512px; }
-        }
-
-        .btn-new-chat { 
-            background: #fff; border: 1px solid #cbd5e1; color: #334155; padding: 12px; 
-            border-radius: 12px; cursor: pointer; text-align: left; font-size: 14px; 
-            font-weight: 500; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .btn-new-chat:hover { background: #f1f5f9; }
-        .sidebar-title { font-size: 11px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; margin-top: 10px; }
         
-        /* Vùng Danh Sách Lịch Sử Trò Chuyện Động */
-        .history-list { display: flex; flex-direction: column; gap: 6px; list-style: none; overflow-y: auto; flex: 1; }
-        .history-item { 
-            padding: 12px; border-radius: 10px; cursor: pointer; color: #475569; 
-            display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 14px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .history-item:hover { background: #f1f5f9; color: #0f172a; }
-        .history-item.active { background: #e0f2fe; color: #0284c7; font-weight: 600; }
+        /* User Profile (Góc dưới trái) */
+        .user-profile { display: flex; align-items: center; gap: 12px; padding-top: 15px; border-top: 1px solid #e1e4e8; cursor: pointer; }
+        .user-profile img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #e1e4e8; }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-size: 14px; font-weight: bold; color: #333; }
+        .user-sub { font-size: 11px; color: #888; }
 
-        /* Khu vực Hồ Sơ Đổi Ảnh Đại Diện */
-        .user-profile-section {
-            border-top: 1px solid #e2e8f0; padding-top: 15px; display: flex; align-items: center; gap: 12px; position: relative;
-        }
-        .user-avatar-wrapper { position: relative; width: 44px; height: 44px; cursor: pointer; }
-        .user-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #1e88e5; }
-        .avatar-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
-            background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center;
-            opacity: 0; transition: 0.2s; color: #fff; font-size: 12px;
-        }
-        .user-avatar-wrapper:hover .avatar-overlay { opacity: 1; }
-
-        /* Vùng hiển thị chính phía bên phải */
-        .main-chat-area { flex: 1; display: flex; flex-direction: column; position: relative; background: #fff; }
-
-        /* Form Nhập Thông Tin Đăng Nhập Ban Đầu */
-        .auth-container { 
-            position: absolute; inset: 0; background: #fff; display: flex; 
-            flex-direction: column; justify-content: center; align-items: center; z-index: 10; 
-        }
-        .auth-box { width: 380px; text-align: center; padding: 20px; }
-        .auth-box h2 { color: #1e88e5; margin-bottom: 20px; font-size: 26px; }
-        .form-group { margin-bottom: 16px; text-align: left; }
-        .form-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #64748b; font-weight: 500; }
-        .form-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-size: 14px; }
-        .btn-submit { 
-            width: 100%; padding: 14px; background: #1e88e5; border: none; color: white; 
-            font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 10px; font-size: 15px;
-        }
-
-        /* Khung Đầu Chat (Đã xóa chữ "Phiên tư vấn tâm lý") */
+        /* -----------------------------------------
+           MAIN CHAT AREA (KHUNG CHAT PHẢI)
+        ----------------------------------------- */
+        .main-chat { flex: 1; display: flex; flex-direction: column; background: #eef2f5 url('https://www.transparenttextures.com/patterns/cubes.png'); position: relative; }
+        
         .chat-header { 
-            padding: 18px 24px; border-bottom: 1px solid #f1f5f9; 
-            display: flex; align-items: center; gap: 8px; background: #fff;
+            padding: 15px 20px; 
+            background: white; 
+            border-bottom: 1px solid #e1e4e8; 
+            font-weight: 600; 
+            color: #2bc06a; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
-        .status-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; }
-        .status-text { font-size: 14px; color: #22c55e; font-weight: 600; }
-
-        /* Vùng Nội Dung Chat có Hình Nền Sóng Biển Ẩn Mờ */
-        .chat-messages-container { 
-            flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; 
-            background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000') no-repeat center center;
-            background-size: cover;
-        }
+        .status-dot { width: 8px; height: 8px; background: #2bc06a; border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
         
-        .msg-row { display: flex; gap: 12px; max-width: 80%; }
-        .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+        /* Nút mở Menu trên Mobile */
+        .menu-toggle { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: #555; margin-right: 5px; }
+
+        /* Khung chứa các dòng tin nhắn */
+        .messages-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .msg-row { display: flex; align-items: flex-start; gap: 12px; max-width: 75%; }
         .msg-row.bot { align-self: flex-start; }
-
-        .msg-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-        .msg-bubble { padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
-        .msg-row.user .msg-bubble { background: #0084ff; color: #fff; border-top-right-radius: 2px; }
-        .msg-row.bot .msg-bubble { background: #fff; color: #1e293b; border-top-left-radius: 2px; border: 1px solid #e2e8f0; }
+        .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
         
-        /* Nút phát âm thanh giả lập giống trong ảnh */
-        .audio-btn {
-            display: inline-flex; align-items: center; gap: 6px; background: #f1f5f9; border: none;
-            padding: 6px 12px; border-radius: 20px; font-size: 12px; color: #1e88e5; cursor: pointer; margin-top: 6px; font-weight: 500;
-        }
-
-        /* Khung Xem Trước Ảnh Trước Khi Gửi */
-        .preview-box { 
-            display: none; padding: 8px 24px; background: #f8fafc; 
-            border-top: 1px solid #f1f5f9; align-items: center; gap: 10px; 
-        }
-        .preview-img { height: 50px; border-radius: 6px; border: 1px solid #cbd5e1; }
-        .cancel-img-btn { color: #ef4444; cursor: pointer; font-size: 18px; }
-
-        /* Khung Nhập Tin Nhắn Dạng Viên Thuốc (Pill Shape) */
-        .chat-input-wrapper { padding: 16px 24px; background: #fff; border-top: 1px solid #f1f5f9; }
-        .pill-input-bar { 
-            display: flex; align-items: center; background: #f1f5f9; 
-            border-radius: 30px; padding: 6px 10px 6px 18px; gap: 12px; 
-        }
-        .pill-input-bar input { 
-            flex: 1; background: none; border: none; outline: none; 
-            font-size: 15px; color: #334155; padding: 8px 0; 
-        }
-        .icon-btn { color: #64748b; font-size: 20px; cursor: pointer; transition: 0.2s; padding: 4px; }
-        .icon-btn:hover { color: #1e88e5; }
-        .btn-send-pill { 
-            background: #1e88e5; color: white; border: none; width: 38px; height: 38px; 
-            border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s;
-        }
-        .btn-send-pill:hover { background: #1565c0; }
+        .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .msg-content-area { display: flex; flex-direction: column; gap: 5px; }
         
-        .chat-attached-img { max-width: 200px; border-radius: 10px; margin-bottom: 6px; display: block; }
+        .msg-bubble { 
+            padding: 14px 18px; 
+            border-radius: 18px; 
+            font-size: 15px; 
+            line-height: 1.5; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04); 
+            word-wrap: break-word; 
+            white-space: pre-line;
+        }
+        .bot .msg-bubble { background: white; color: #2c3e50; border-top-left-radius: 2px; }
+        .user .msg-bubble { background: #1da1f2; color: white; border-top-right-radius: 2px; }
+        .msg-bubble img { max-width: 100%; max-height: 250px; border-radius: 10px; margin-bottom: 8px; display: block; }
+        
+        /* Nút "Nghe tin nhắn" đúng như trong ảnh mẫu */
+        .tts-btn { 
+            background: #f0f4f8; 
+            border: none; 
+            padding: 5px 12px; 
+            border-radius: 15px; 
+            font-size: 12px; 
+            color: #1da1f2; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 4px; 
+            font-weight: 500;
+            width: fit-content;
+            margin-top: 2px;
+            transition: 0.2s;
+        }
+        .tts-btn:hover { background: #e1f0fa; }
+
+        /* -----------------------------------------
+           INPUT AREA (THANH NHẬP LIỆU PHÍA DƯỚI)
+        ----------------------------------------- */
+        .input-area { padding: 15px 25px 25px 25px; background: transparent; }
+        .input-container-box { max-width: 900px; margin: 0 auto; width: 100%; }
+        
+        .input-wrapper { 
+            display: flex; 
+            align-items: center; 
+            background: white; 
+            padding: 8px 15px; 
+            border-radius: 30px; 
+            gap: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid #e1e4e8;
+        }
+        .icon-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #758695; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .icon-btn:hover { color: #1da1f2; }
+        
+        input[type="text"] { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; color: #333; padding: 8px 0; }
+        
+        /* Box xem trước ảnh nhỏ gọn ngay trên ô gõ chữ */
+        #imgPreviewBox { 
+            display: none; 
+            margin-bottom: 10px; 
+            padding: 6px; 
+            background: #fff; 
+            border: 1px solid #e1e4e8; 
+            border-radius: 12px; 
+            width: fit-content; 
+            position: relative; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        #imgPreview { max-height: 75px; border-radius: 8px; display: block; }
+        #removeImgBtn { position: absolute; top: -6px; right: -6px; background: #ff4757; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        /* Màn che mờ khi mở Sidebar trên điện thoại */
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 998; }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* -----------------------------------------
+           RSPONSIVE MEDIA QUERIES (SỬA ĐỂ TƯƠNG THÍCH MOBILE)
+        ----------------------------------------- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; } /* Hiện nút ba gạch */
+            
+            /* Giấu sidebar sang lề trái */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; }
+            
+            .msg-row { max-width: 88%; } /* Cho bong bóng chat rộng hơn trên màn hình hẹp */
+            .input-area { padding: 10px 15px 15px 15px; }
+            .msg-bubble { padding: 11px 15px; font-size: 14px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="app-window">
-        <div class="sidebar">
-            <div class="logo-container">
-                <div class="running-mascot"></div>
-                <span class="logo-text">MindGuard</span>
-            </div>
-            
-            <button class="btn-new-chat" onclick="startNewChatSession()"><i class="fas fa-plus"></i> Cuộc trò chuyện mới</button>
-            
-            <div class="sidebar-title">LỊCH SỬ TRÒ CHUYỆN</div>
-            <ul class="history-list" id="chatHistoryList"></ul>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-            <div class="user-profile-section" id="profileArea" style="display:none;">
-                <div class="user-avatar-wrapper" onclick="document.getElementById('avatarUploader').click()">
-                    <img id="userDisplayAvatar" class="user-avatar" src="https://api.dicebear.com/7.x/lorelei/svg?seed=user" alt="Avatar">
-                    <div class="avatar-overlay"><i class="fas fa-camera"></i></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div class="logo-icon">M</div>
+            <div class="logo-text">MindGuard</div>
+        </div>
+        <button class="new-chat-btn" onclick="clearHistory()">+ Cuộc trò chuyện mới</button>
+        
+        <div class="history-title">Gần đây</div>
+        <div class="history-list">
+            <div class="history-item">💬 Phiên chat hiện tại</div>
+        </div>
+        
+        <div class="user-profile" onclick="document.getElementById('avatarInput').click()">
+            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar">
+            <div class="user-info">
+                <span class="user-name">thinh</span>
+                <span class="user-sub">Click để đổi ảnh</span>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="changeAvatar(event)">
+        </div>
+    </aside>
+
+    <main class="main-chat">
+        <div class="chat-header">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <span class="status-dot"></span>
+            <span>MindGuard Trực tuyến</span>
+        </div>
+        
+        <div class="messages-box" id="chatBox">
+            </div>
+
+        <div class="input-area">
+            <div class="input-container-box">
+                <div id="imgPreviewBox">
+                    <img id="imgPreview" src="" alt="Preview">
+                    <button id="removeImgBtn" onclick="removeImage()">✖</button>
                 </div>
-                <div>
-                    <div id="lblUserName" style="font-weight: 600; color: #1e293b; font-size: 14px;">Học sinh</div>
-                    <div style="font-size: 11px; color: #94a3b8;">Click để đổi ảnh</div>
+                
+                <div class="input-wrapper">
+                    <button class="icon-btn" onclick="document.getElementById('imageUpload').click()">📎</button>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                    
+                    <input type="text" id="userInput" placeholder="Nhắn tin cho MindGuard..." onkeypress="handleEnter(event)">
+                    
+                    <button class="icon-btn" style="color: #1da1f2;" onclick="sendMessage()">➤</button>
                 </div>
-                <input type="file" id="avatarUploader" accept="image/*" style="display:none;" onchange="changeUserAvatar(this)">
             </div>
         </div>
-
-        <div class="main-chat-area">
-            
-            <div id="authBox" class="auth-container">
-                <div class="auth-box">
-                    <h2>Kết nối MindGuard</h2>
-                    <div class="form-group">
-                        <label>Tên gọi của bạn</label>
-                        <input type="text" id="username" placeholder="Ví dụ: Thịnh">
-                    </div>
-                    <div class="form-group">
-                        <label>Mã Chat ID Telegram cá nhân của bạn</label>
-                        <input type="text" id="tokenId" placeholder="Ví dụ: 5871531291">
-                    </div>
-                    <button class="btn-submit" onclick="handleLoginSubmit()">BẮT ĐẦU TRÒ CHUYỆN</button>
-                </div>
-            </div>
-
-            <div class="chat-header">
-                <div class="status-dot"></div>
-                <div class="status-text">MindGuard Trực tuyến</div>
-            </div>
-
-            <div class="chat-messages-container" id="chatMessagesBox"></div>
-
-            <div class="preview-box" id="imagePreviewContainer">
-                <img src="" id="imgPreviewSource" class="preview-img">
-                <i class="fas fa-times-circle cancel-img-btn" onclick="clearAttachedImage()"></i>
-                <span style="font-size: 12px; color: #64748b;">Ảnh đã được đính kèm thành công</span>
-            </div>
-
-            <div class="chat-input-wrapper">
-                <div class="pill-input-bar">
-                    <i class="far fa-image icon-btn" title="Đính kèm hình ảnh" onclick="document.getElementById('chatImageUploader').click()"></i>
-                    <input type="file" id="chatImageUploader" accept="image/*" style="display:none;" onchange="handleChatImageSelect(this)">
-                    
-                    <input type="text" id="chatTextInput" placeholder="Nhắn tin cho MindGuard..." onkeypress="if(event.key === 'Enter') triggerSendMessage()">
-                    
-                    <button class="btn-send-pill" onclick="triggerSendMessage()"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-
-        </div>
-    </div>
+    </main>
 
     <script>
-        let currentUser = { name: '', token: '', avatar: 'https://api.dicebear.com/7.x/lorelei/svg?seed=Thinh' };
-        let conversations = {}; 
-        let activeChatId = null;
-        let attachedImageBase64 = null;
-
-        function handleLoginSubmit() {
-            const name = document.getElementById('username').value.trim();
-            const token = document.getElementById('tokenId').value.trim();
-            if (!name || !token) { alert("Vui lòng điền đủ thông tin nha!"); return; }
-
-            currentUser.name = name;
-            currentUser.token = token;
-            
-            document.getElementById('lblUserName').innerText = name;
-            document.getElementById('userDisplayAvatar').src = currentUser.avatar;
-            document.getElementById('profileArea').style.display = 'flex';
-            document.getElementById('authBox').style.display = 'none';
-
-            startNewChatSession();
+        const USER_NAME = "Thịnh";
+        const TOKEN_ID = "123456"; 
+        let currentImageBase64 = null;
+        const chatBox = document.getElementById('chatBox');
+        
+        // --- ĐÓNG MỞ SIDEBAR TRÊN MOBILE ---
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        function changeUserAvatar(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentUser.avatar = e.target.result;
-                    document.getElementById('userDisplayAvatar').src = e.target.result;
-                    document.querySelectorAll('.msg-row.user .msg-avatar').forEach(img => img.src = e.target.result);
-                }
-                reader.readAsDataURL(input.files[0]);
+        // --- KHỞI TẠO HỆ THỐNG ---
+        window.onload = () => {
+            loadAvatar();
+            loadHistory();
+            if (chatBox.innerHTML.trim() === "") {
+                appendMessage("bot", "Ui xin chào bạn nha! Mình là MindGuard đây, hôm nay cậu có chuyện gì muốn trút bầu tâm sự với mình không nè? 💙");
+            }
+        };
+
+        function saveHistory() { localStorage.setItem('chatHistory', chatBox.innerHTML); }
+        function loadHistory() {
+            const history = localStorage.getItem('chatHistory');
+            if (history) { chatBox.innerHTML = history; chatBox.scrollTop = chatBox.scrollHeight; }
+        }
+        function clearHistory() {
+            if(confirm("Bạn có chắc muốn xóa lịch sử trò chuyện này?")) {
+                localStorage.removeItem('chatHistory');
+                chatBox.innerHTML = "";
+                appendMessage("bot", "Mình đã xóa lịch sử cũ rồi. Chúng ta bắt đầu lại nhé! 🥰");
+                if(window.innerWidth <= 768) toggleSidebar();
             }
         }
 
-        function startNewChatSession() {
-            const chatId = 'chat_' + Date.now();
-            const timeStr = new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
-            
-            conversations[chatId] = {
-                title: `Trò chuyện lúc ${timeStr}`,
-                messages: [
-                    { sender: 'bot', text: `Ui xin chào bạn nha! Mình là MindGuard đây, hôm nay cậu có chuyện gì muốn trút bầu tâm sự với mình không nè?` }
-                ]
-            };
-
-            activeChatId = chatId;
-            renderHistorySidebar();
-            loadActiveChatMessages();
-        }
-
-        function renderHistorySidebar() {
-            const listEl = document.getElementById('chatHistoryList');
-            listEl.innerHTML = '';
-            
-            Object.keys(conversations).forEach(id => {
-                const li = document.createElement('li');
-                li.className = `history-item ${id === activeChatId ? 'active' : ''}`;
-                li.onclick = () => { activeChatId = id; renderHistorySidebar(); loadActiveChatMessages(); };
-                li.innerHTML = `<i class="far fa-comment"></i> ${conversations[id].title}`;
-                listEl.appendChild(li);
-            });
-        }
-
-        function loadActiveChatMessages() {
-            const box = document.getElementById('chatMessagesBox');
-            box.innerHTML = '';
-            
-            const currentMessages = conversations[activeChatId].messages;
-            currentMessages.forEach(msg => {
-                appendMessageToUI(msg.text, msg.sender, msg.imgSrc, false);
-            });
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function handleChatImageSelect(input) {
-            if (input.files && input.files[0]) {
+        // --- ĐỔI ẢNH ĐẠI DIỆN ---
+        function changeAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    attachedImageBase64 = e.target.result;
-                    document.getElementById('imgPreviewSource').src = e.target.result;
-                    document.getElementById('imagePreviewContainer').style.display = 'flex';
-                }
-                reader.readAsDataURL(input.files[0]);
+                    document.getElementById('userAvatar').src = e.target.result;
+                    localStorage.setItem('userAvatar', e.target.result);
+                    // Cập nhật lại các avatar cũ của User trên màn hình nếu muốn đồng bộ
+                    document.querySelectorAll('.msg-row.user .avatar').forEach(img => img.src = e.target.result);
+                };
+                reader.readAsDataURL(file);
             }
         }
-
-        function clearAttachedImage() {
-            attachedImageBase64 = null;
-            document.getElementById('chatImageUploader').value = '';
-            document.getElementById('imagePreviewContainer').style.display = 'none';
+        function loadAvatar() {
+            const savedAvatar = localStorage.getItem('userAvatar');
+            if (savedAvatar) { document.getElementById('userAvatar').src = savedAvatar; }
         }
 
-        async function triggerSendMessage() {
-            const inputEl = document.getElementById('chatTextInput');
-            const text = inputEl.value.trim();
-            
-            if (!text && !attachedImageBase64) return;
+        // --- XỬ LÝ ĐÍNH KÈM ẢNH CHAT ---
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageBase64 = e.target.result;
+                    document.getElementById('imgPreview').src = currentImageBase64;
+                    document.getElementById('imgPreviewBox').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
+        }
+        function removeImage() {
+            currentImageBase64 = null;
+            document.getElementById('imgPreviewBox').style.display = 'none';
+            document.getElementById('imgPreview').src = '';
+        }
 
-            conversations[activeChatId].messages.push({
-                sender: 'user',
-                text: text,
-                imgSrc: attachedImageBase64
-            });
+        // --- CLICK GỬI TIN ---
+        function handleEnter(event) { if (event.key === 'Enter') { sendMessage(); } }
 
-            appendMessageToUI(text, 'user', attachedImageBase64, true);
+        async function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const text = inputField.value.trim();
+            const imgData = currentImageBase64;
             
-            const imgToSend = attachedImageBase64;
-            inputEl.value = '';
-            clearAttachedImage();
+            if (text === "" && !imgData) return;
+            
+            inputField.value = "";
+            removeImage();
+
+            appendMessage("user", text, imgData);
+            
+            const loadingId = "loading-" + Date.now();
+            appendMessage("bot", "Đang suy nghĩ...", null, loadingId);
 
             try {
                 const response = await fetch('/chat', {
@@ -341,58 +344,46 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: text,
-                        user_name: currentUser.name,
-                        token_id: currentUser.token,
-                        image: imgToSend
+                        user_name: USER_NAME,
+                        token_id: TOKEN_ID,
+                        image: imgData
                     })
                 });
-
-                const data = await response.json();
                 
-                conversations[activeChatId].messages.push({ sender: 'bot', text: data.reply });
-                appendMessageToUI(data.reply, 'bot', null, true);
-
-            } catch (err) {
-                appendMessageToUI("Haizz, mạng mẽo chán quá đi mất, cậu gửi lại tin nhắn vừa rồi nha.", 'bot', null, true);
+                const data = await response.json();
+                document.getElementById(loadingId).innerText = data.reply;
+                saveHistory();
+            } catch (error) {
+                document.getElementById(loadingId).innerText = "Xin lỗi, mình đang gặp chút sự cố đường truyền mạng. Bạn thử lại nhé! 💔";
+                saveHistory();
             }
         }
 
-        function appendMessageToUI(text, sender, imgSrc = null, scroll = true) {
-            const box = document.getElementById('chatMessagesBox');
-            const row = document.createElement('div');
-            row.className = `msg-row ${sender}`;
+        // --- HIỂN THỊ TIN NHẮN LÊN MÀN HÌNH CHAT ---
+        function appendMessage(sender, text, imageBase64 = null, textId = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `msg-row ${sender}`;
             
-            const avatarSrc = (sender === 'user') ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=MindGuard';
-            
-            let imgHtml = '';
-            if (imgSrc) { imgHtml = `<img src="${imgSrc}" class="chat-attached-img" />`; }
+            let avatarSrc = sender === 'bot' 
+                ? "https://cdn-icons-png.flaticon.com/512/4712/4712038.png" 
+                : document.getElementById('userAvatar').src;
 
-            let audioBtnHtml = '';
-            if (sender === 'bot') {
-                audioBtnHtml = `<br><button class="audio-btn" onclick="mockSpeak('${text.replace(/'|"/g, '')}')"><i class="fas fa-play"></i> Nghe tin nhắn</button>`;
-            }
+            let contentHTML = "";
+            if (imageBase64) contentHTML += `<img src="${imageBase64}" alt="Sent Image" />`;
+            if (text) contentHTML += `<span ${textId ? `id="${textId}"` : ""}>${text}</span>`;
 
-            row.innerHTML = `
-                <img class="msg-avatar" src="${avatarSrc}">
-                <div class="msg-bubble">
-                    ${imgHtml}
-                    <div>${text}</div>
-                    ${audioBtnHtml}
+            // Đoạn cấu trúc HTML chuẩn kết hợp nút Nghe tin nhắn như bản vẽ mẫu của bạn
+            msgDiv.innerHTML = `
+                <img src="${avatarSrc}" class="avatar" alt="Avatar">
+                <div class="msg-content-area">
+                    <div class="msg-bubble">${contentHTML}</div>
+                    ${sender === 'bot' && !textId ? `<button class="tts-btn">▶ Nghe tin nhắn</button>` : ''}
                 </div>
             `;
             
-            box.appendChild(row);
-            if (scroll) box.scrollTop = box.scrollHeight;
-        }
-
-        function mockSpeak(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'vi-VN';
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert("Trình duyệt không hỗ trợ đọc giọng nói mất rồi!");
-            }
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            saveHistory();
         }
     </script>
 </body>
