@@ -4,268 +4,319 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindGuard AI — Trợ lý tâm lý</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; height: 100vh; background-color: #f0f4f8; overflow: hidden; position: relative; }
         
+        /* Hình nền bờ biển thư giãn toàn màn hình */
+        body { 
+            display: flex; 
+            height: 100vh; 
+            background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background-size: cover;
+            overflow: hidden; 
+            position: relative; 
+        }
+
         /* -----------------------------------------
-           SIDEBAR (THANH BÊN TRÁI)
+           POPUP NHẬP THÔNG TIN (GLASSMORPHISM)
+        ----------------------------------------- */
+        .login-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 9999; transition: 0.3s ease; 
+        }
+        .login-box { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(10px);
+            padding: 35px; border-radius: 24px; width: 90%; max-width: 400px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .login-box i.main-icon { font-size: 48px; color: #1da1f2; margin-bottom: 15px; }
+        .login-box h3 { font-size: 24px; color: #2c3e50; margin-bottom: 8px; font-weight: 700; }
+        .login-box p { font-size: 14px; color: #5a6b7c; margin-bottom: 25px; }
+        .login-input { 
+            width: 100%; padding: 14px 18px; border: 1px solid rgba(0,0,0,0.08); 
+            border-radius: 14px; margin-bottom: 15px; outline: none; font-size: 15px; 
+            transition: 0.3s; background: rgba(255,255,255,0.6);
+        }
+        .login-input:focus { border-color: #1da1f2; background: white; box-shadow: 0 0 10px rgba(29,161,242,0.15); }
+        .login-btn { 
+            width: 100%; padding: 14px; 
+            background: linear-gradient(135deg, #1da1f2, #0084b4); 
+            color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; 
+            cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(29,161,242,0.3);
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(29,161,242,0.4); }
+
+        /* -----------------------------------------
+           SIDEBAR (THANH BÊN TRÁI HIỆU ỨNG KÍNH)
         ----------------------------------------- */
         .sidebar { 
-            width: 280px; 
-            background-color: #ffffff; 
-            padding: 20px; 
+            width: 300px; 
+            background: rgba(255, 255, 255, 0.45); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            padding: 25px 20px; 
             display: flex; 
             flex-direction: column; 
-            border-right: 1px solid #e1e4e8;
-            transition: transform 0.3s ease;
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 999;
         }
-        .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
-        .logo-icon { width: 30px; height: 30px; background: #1da1f2; color: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; }
-        .logo-text { font-size: 22px; font-weight: bold; color: #1da1f2; }
+        .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .logo-icon { 
+            width: 36px; height: 36px; 
+            background: linear-gradient(135deg, #1da1f2, #005f87); 
+            color: white; display: flex; align-items: center; justify-content: center; 
+            border-radius: 12px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 10px rgba(29,161,242,0.3);
+        }
+        .logo-text { font-size: 22px; font-weight: 800; color: #1da1f2; letter-spacing: -0.5px; }
         
         .new-chat-btn { 
-            padding: 12px; 
-            background: white; 
-            border: 1px solid #e1e4e8; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 500;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            gap: 8px; 
-            margin-bottom: 25px; 
-            transition: 0.2s; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 14px; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255,255,255,0.5); 
+            border-radius: 14px; cursor: pointer; font-weight: 600; color: #2c3e50;
+            display: flex; align-items: center; justify-content: center; gap: 10px; 
+            margin-bottom: 30px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .new-chat-btn:hover { background: #f7f9fa; border-color: #b4dbf7; }
+        .new-chat-btn:hover { background: white; border-color: #1da1f2; color: #1da1f2; transform: translateY(-1px); }
         
-        .history-title { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .history-title { font-size: 11px; font-weight: 700; color: #657786; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
         .history-list { flex: 1; overflow-y: auto; }
         .history-item { 
-            padding: 12px; 
-            background: #e8f5fd; 
-            border-radius: 10px; 
-            font-size: 14px; 
-            color: #1da1f2; 
-            font-weight: 500;
-            cursor: pointer; 
-            margin-bottom: 8px; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            padding: 12px 15px; background: rgba(29, 161, 242, 0.12); 
+            border-radius: 12px; font-size: 14px; color: #117cb4; font-weight: 600; 
+            cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;
+            transition: 0.2s; border: 1px solid rgba(29, 161, 242, 0.05);
         }
+        .history-item:hover { background: rgba(29, 161, 242, 0.2); transform: translateX(2px); }
         
-        /* User Profile (Góc dưới trái) */
-        .user-profile { display: flex; align-items: center; gap: 12px; padding-top: 15px; border-top: 1px solid #e1e4e8; cursor: pointer; }
-        .user-profile img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #e1e4e8; }
+        /* Thông tin người dùng nâng cấp mượt hơn */
+        .user-profile { 
+            display: flex; align-items: center; gap: 12px; padding-top: 18px; 
+            border-top: 1px solid rgba(0,0,0,0.06); cursor: pointer; transition: 0.2s;
+        }
+        .user-profile:hover { opacity: 0.85; }
+        .user-profile img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
         .user-info { display: flex; flex-direction: column; }
-        .user-name { font-size: 14px; font-weight: bold; color: #333; }
-        .user-sub { font-size: 11px; color: #888; }
+        .user-name { font-size: 15px; font-weight: 700; color: #2c3e50; text-transform: capitalize; }
+        .user-sub { font-size: 11px; color: #657786; margin-top: 1px; }
 
         /* -----------------------------------------
-           MAIN CHAT AREA (KHUNG CHAT PHẢI)
+           KHUNG CHAT PHẢI (HIỆU ỨNG HỘP KÍNH)
         ----------------------------------------- */
-        .main-chat { flex: 1; display: flex; flex-direction: column; background: #eef2f5 url('https://www.transparenttextures.com/patterns/cubes.png'); position: relative; }
+        .main-chat { flex: 1; display: flex; flex-direction: column; position: relative; padding: 15px 20px 20px 20px; }
         
-        .chat-header { 
-            padding: 15px 20px; 
-            background: white; 
-            border-bottom: 1px solid #e1e4e8; 
-            font-weight: 600; 
-            color: #2bc06a; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        /* Hộp chat bo góc lơ lửng trên màn hình nền */
+        .chat-container-inner {
+            flex: 1; display: flex; flex-direction: column;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
         }
-        .status-dot { width: 8px; height: 8px; background: #2bc06a; border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
-        
-        /* Nút mở Menu trên Mobile */
-        .menu-toggle { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: #555; margin-right: 5px; }
 
-        /* Khung chứa các dòng tin nhắn */
-        .messages-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-        .msg-row { display: flex; align-items: flex-start; gap: 12px; max-width: 75%; }
+        .chat-header { 
+            padding: 18px 25px; background: rgba(255, 255, 255, 0.4); 
+            border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 700; 
+            color: #2bc06a; display: flex; align-items: center; gap: 12px;
+        }
+        .status-dot { width: 9px; height: 9px; background: #2bc06a; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #2bc06a; }
+        .menu-toggle { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: #2c3e50; margin-right: 5px; }
+
+        /* Vùng hiển thị tin nhắn */
+        .messages-box { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; }
+        .msg-row { display: flex; align-items: flex-start; gap: 14px; max-width: 75%; }
         .msg-row.bot { align-self: flex-start; }
         .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
         
-        .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .msg-content-area { display: flex; flex-direction: column; gap: 5px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 2px solid white; }
+        .msg-content-area { display: flex; flex-direction: column; gap: 6px; }
         
+        /* Bong bóng chat bo góc thẩm mỹ cao */
         .msg-bubble { 
-            padding: 14px 18px; 
-            border-radius: 18px; 
-            font-size: 15px; 
-            line-height: 1.5; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04); 
-            word-wrap: break-word; 
-            white-space: pre-line;
+            padding: 14px 20px; border-radius: 20px; font-size: 15px; line-height: 1.5; 
+            word-wrap: break-word; white-space: pre-line; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        .bot .msg-bubble { background: white; color: #2c3e50; border-top-left-radius: 2px; }
-        .user .msg-bubble { background: #1da1f2; color: white; border-top-right-radius: 2px; }
-        .msg-bubble img { max-width: 100%; max-height: 250px; border-radius: 10px; margin-bottom: 8px; display: block; }
+        .bot .msg-bubble { 
+            background: white; color: #2c3e50; border-top-left-radius: 4px; 
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+        .user .msg-bubble { 
+            background: linear-gradient(135deg, #1da1f2, #0084b4); color: white; border-top-right-radius: 4px; 
+        }
+        .msg-bubble img { max-width: 100%; max-height: 220px; border-radius: 12px; margin-bottom: 8px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
-        /* Nút "Nghe tin nhắn" đúng như trong ảnh mẫu */
+        /* Nút Nghe tin nhắn thiết kế hiện đại kèm Icon */
         .tts-btn { 
-            background: #f0f4f8; 
-            border: none; 
-            padding: 5px 12px; 
-            border-radius: 15px; 
-            font-size: 12px; 
-            color: #1da1f2; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 4px; 
-            font-weight: 500;
-            width: fit-content;
-            margin-top: 2px;
-            transition: 0.2s;
+            background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(29,161,242,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #1da1f2; 
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; width: fit-content; margin-top: 3px; transition: 0.2s;
         }
-        .tts-btn:hover { background: #e1f0fa; }
+        .tts-btn:hover { background: #1da1f2; color: white; transform: scale(1.02); }
 
         /* -----------------------------------------
-           INPUT AREA (THANH NHẬP LIỆU PHÍA DƯỚI)
+           INPUT AREA (THANH GÕ TIN NHẮN TẬP TRUNG)
         ----------------------------------------- */
-        .input-area { padding: 15px 25px 25px 25px; background: transparent; }
-        .input-container-box { max-width: 900px; margin: 0 auto; width: 100%; }
+        .input-area { padding: 15px 25px 20px 25px; background: rgba(255, 255, 255, 0.2); border-top: 1px solid rgba(0,0,0,0.04); }
         
         .input-wrapper { 
-            display: flex; 
-            align-items: center; 
-            background: white; 
-            padding: 8px 15px; 
-            border-radius: 30px; 
-            gap: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            border: 1px solid #e1e4e8;
+            display: flex; align-items: center; background: white; padding: 10px 20px; border-radius: 30px; gap: 14px; 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.05); transition: 0.3s;
         }
-        .icon-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #758695; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .icon-btn:hover { color: #1da1f2; }
+        .input-wrapper:focus-within { border-color: #1da1f2; box-shadow: 0 6px 22px rgba(29,161,242,0.12); }
         
-        input[type="text"] { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; color: #333; padding: 8px 0; }
+        .icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #8899a6; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .icon-btn:hover { color: #1da1f2; transform: scale(1.08); }
         
-        /* Box xem trước ảnh nhỏ gọn ngay trên ô gõ chữ */
-        #imgPreviewBox { 
-            display: none; 
-            margin-bottom: 10px; 
-            padding: 6px; 
-            background: #fff; 
-            border: 1px solid #e1e4e8; 
-            border-radius: 12px; 
-            width: fit-content; 
-            position: relative; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        #imgPreview { max-height: 75px; border-radius: 8px; display: block; }
-        #removeImgBtn { position: absolute; top: -6px; right: -6px; background: #ff4757; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input[type="text"] { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; color: #2c3e50; }
+        input[type="text"]::placeholder { color: #aab8c2; }
+        
+        /* Khung Preview ảnh nhỏ */
+        #imgPreviewBox { display: none; margin-bottom: 12px; padding: 6px; background: #fff; border: 1px solid #e1e4e8; border-radius: 14px; width: fit-content; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        #imgPreview { max-height: 80px; border-radius: 10px; display: block; }
+        #removeImgBtn { position: absolute; top: -6px; right: -6px; background: #ff4757; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        /* Màn che mờ khi mở Sidebar trên điện thoại */
-        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 998; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 998; backdrop-filter: blur(4px); }
 
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
-        /* -----------------------------------------
-           RSPONSIVE MEDIA QUERIES (SỬA ĐỂ TƯƠNG THÍCH MOBILE)
-        ----------------------------------------- */
+        /* Tương thích hoàn hảo cho Điện Thoại */
         @media (max-width: 768px) {
-            .menu-toggle { display: block; } /* Hiện nút ba gạch */
-            
-            /* Giấu sidebar sang lề trái */
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                transform: translateX(-100%);
-            }
+            body { padding: 0; }
+            .main-chat { padding: 0; }
+            .chat-container-inner { border-radius: 0; border: none; }
+            .menu-toggle { display: block; }
+            .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); background: rgba(255,255,255,0.95); box-shadow: 5px 0 25px rgba(0,0,0,0.1); }
             .sidebar.open { transform: translateX(0); }
             .sidebar-overlay.show { display: block; }
-            
-            .msg-row { max-width: 88%; } /* Cho bong bóng chat rộng hơn trên màn hình hẹp */
-            .input-area { padding: 10px 15px 15px 15px; }
-            .msg-bubble { padding: 11px 15px; font-size: 14px; }
+            .msg-row { max-width: 88%; }
+            .input-area { padding: 12px 15px 15px 15px; }
         }
     </style>
 </head>
 <body>
 
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <i class="fa-solid fa-heart-pulse main-icon"></i>
+            <h3>Chào mừng tới MindGuard 💙</h3>
+            <p>Hãy chia sẻ thông tin để nhận được sự đồng hành tốt nhất từ trợ lý học đường nhé!</p>
+            <input type="text" id="usernameInput" class="login-input" placeholder="Nhập tên của bạn...">
+            <input type="text" id="telegramIdInput" class="login-input" placeholder="Nhập Telegram Chat ID của bạn...">
+            <button class="login-btn" onclick="submitUserInfo()">Bắt đầu trò chuyện</button>
+        </div>
+    </div>
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <aside class="sidebar" id="sidebar">
         <div class="logo-container">
-            <div class="logo-icon">M</div>
+            <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
             <div class="logo-text">MindGuard</div>
         </div>
-        <button class="new-chat-btn" onclick="clearHistory()">+ Cuộc trò chuyện mới</button>
+        <button class="new-chat-btn" onclick="clearHistory()"><i class="fa-solid fa-plus"></i> Cuộc trò chuyện mới</button>
         
-        <div class="history-title">Gần đây</div>
+        <div class="history-title">Lịch sử gần đây</div>
         <div class="history-list">
-            <div class="history-item">💬 Phiên chat hiện tại</div>
+            <div class="history-item"><i class="fa-regular fa-comment-dots"></i> Phiên chat hiện tại</div>
         </div>
         
         <div class="user-profile" onclick="document.getElementById('avatarInput').click()">
             <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar">
             <div class="user-info">
-                <span class="user-name">thinh</span>
-                <span class="user-sub">Click để đổi ảnh</span>
+                <span class="user-name" id="displayUsername">Bạn ẩn danh</span>
+                <span class="user-sub"><i class="fa-solid fa-camera"></i> Đổi ảnh đại diện</span>
             </div>
             <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="changeAvatar(event)">
         </div>
     </aside>
 
     <main class="main-chat">
-        <div class="chat-header">
-            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-            <span class="status-dot"></span>
-            <span>MindGuard Trực tuyến</span>
-        </div>
-        
-        <div class="messages-box" id="chatBox">
+        <div class="chat-container-inner">
+            <div class="chat-header">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                <span class="status-dot"></span>
+                <span>MindGuard Trực tuyến</span>
             </div>
-
-        <div class="input-area">
-            <div class="input-container-box">
-                <div id="imgPreviewBox">
-                    <img id="imgPreview" src="" alt="Preview">
-                    <button id="removeImgBtn" onclick="removeImage()">✖</button>
+            
+            <div class="messages-box" id="chatBox">
                 </div>
-                
-                <div class="input-wrapper">
-                    <button class="icon-btn" onclick="document.getElementById('imageUpload').click()">📎</button>
-                    <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="previewImage(event)">
+
+            <div class="input-area">
+                <div class="input-container-box">
+                    <div id="imgPreviewBox">
+                        <img id="imgPreview" src="" alt="Preview">
+                        <button id="removeImgBtn" onclick="removeImage()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
                     
-                    <input type="text" id="userInput" placeholder="Nhắn tin cho MindGuard..." onkeypress="handleEnter(event)">
-                    
-                    <button class="icon-btn" style="color: #1da1f2;" onclick="sendMessage()">➤</button>
+                    <div class="input-wrapper">
+                        <button class="icon-btn" onclick="document.getElementById('imageUpload').click()"><i class="fa-solid fa-paperclip"></i></button>
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                        
+                        <input type="text" id="userInput" placeholder="Gửi tin nhắn hoặc hình ảnh cho MindGuard..." onkeypress="handleEnter(event)">
+                        
+                        <button class="icon-btn" style="color: #1da1f2;" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <script>
-        const USER_NAME = "Thịnh";
-        const TOKEN_ID = "123456"; 
+        let USER_NAME = "Bạn ẩn danh";
+        let TOKEN_ID = "000000";
         let currentImageBase64 = null;
         const chatBox = document.getElementById('chatBox');
         
-        // --- ĐÓNG MỞ SIDEBAR TRÊN MOBILE ---
+        // POPUP ĐĂNG NHẬP
+        function submitUserInfo() {
+            const name = document.getElementById('usernameInput').value.trim();
+            const telId = document.getElementById('telegramIdInput').value.trim();
+            
+            if(!name || !telId) {
+                alert("Cậu vui lòng điền đầy đủ Tên và Chat ID nha!");
+                return;
+            }
+            
+            USER_NAME = name;
+            TOKEN_ID = telId;
+            
+            localStorage.setItem('mg_username', USER_NAME);
+            localStorage.setItem('mg_token_id', TOKEN_ID);
+            
+            document.getElementById('displayUsername').innerText = USER_NAME;
+            document.getElementById('loginOverlay').style.display = 'none';
+            
+            initBotGreeting();
+        }
+
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        // --- KHỞI TẠO HỆ THỐNG ---
         window.onload = () => {
             loadAvatar();
-            loadHistory();
-            if (chatBox.innerHTML.trim() === "") {
-                appendMessage("bot", "Ui xin chào bạn nha! Mình là MindGuard đây, hôm nay cậu có chuyện gì muốn trút bầu tâm sự với mình không nè? 💙");
+            
+            const savedName = localStorage.getItem('mg_username');
+            const savedId = localStorage.getItem('mg_token_id');
+            
+            if(savedName && savedId) {
+                USER_NAME = savedName;
+                TOKEN_ID = savedId;
+                document.getElementById('displayUsername').innerText = USER_NAME;
+                document.getElementById('loginOverlay').style.display = 'none';
+                loadHistory();
+                if (chatBox.innerHTML.trim() === "") initBotGreeting();
             }
         };
+
+        function initBotGreeting() {
+            appendMessage("bot", `Ui xin chào ${USER_NAME} nha! Mình là MindGuard đây, hôm nay cậu có chuyện gì muốn trút bầu tâm sự với mình không nè? 💙`);
+        }
 
         function saveHistory() { localStorage.setItem('chatHistory', chatBox.innerHTML); }
         function loadHistory() {
@@ -276,12 +327,12 @@
             if(confirm("Bạn có chắc muốn xóa lịch sử trò chuyện này?")) {
                 localStorage.removeItem('chatHistory');
                 chatBox.innerHTML = "";
-                appendMessage("bot", "Mình đã xóa lịch sử cũ rồi. Chúng ta bắt đầu lại nhé! 🥰");
+                initBotGreeting();
                 if(window.innerWidth <= 768) toggleSidebar();
             }
         }
 
-        // --- ĐỔI ẢNH ĐẠI DIỆN ---
+        // ĐỔI ẢNH ĐẠI DIỆN
         function changeAvatar(event) {
             const file = event.target.files[0];
             if (file) {
@@ -289,8 +340,6 @@
                 reader.onload = function(e) {
                     document.getElementById('userAvatar').src = e.target.result;
                     localStorage.setItem('userAvatar', e.target.result);
-                    // Cập nhật lại các avatar cũ của User trên màn hình nếu muốn đồng bộ
-                    document.querySelectorAll('.msg-row.user .avatar').forEach(img => img.src = e.target.result);
                 };
                 reader.readAsDataURL(file);
             }
@@ -300,7 +349,7 @@
             if (savedAvatar) { document.getElementById('userAvatar').src = savedAvatar; }
         }
 
-        // --- XỬ LÝ ĐÍNH KÈM ẢNH CHAT ---
+        // ĐÍNH KÈM ẢNH CHAT
         function previewImage(event) {
             const file = event.target.files[0];
             if (file) {
@@ -320,7 +369,6 @@
             document.getElementById('imgPreview').src = '';
         }
 
-        // --- CLICK GỬI TIN ---
         function handleEnter(event) { if (event.key === 'Enter') { sendMessage(); } }
 
         async function sendMessage() {
@@ -336,7 +384,7 @@
             appendMessage("user", text, imgData);
             
             const loadingId = "loading-" + Date.now();
-            appendMessage("bot", "Đang suy nghĩ...", null, loadingId);
+            appendMessage("bot", "Đang lắng nghe cậu...", null, loadingId);
 
             try {
                 const response = await fetch('/chat', {
@@ -354,12 +402,23 @@
                 document.getElementById(loadingId).innerText = data.reply;
                 saveHistory();
             } catch (error) {
-                document.getElementById(loadingId).innerText = "Xin lỗi, mình đang gặp chút sự cố đường truyền mạng. Bạn thử lại nhé! 💔";
+                document.getElementById(loadingId).innerText = "Mạng bên mình đang nghẽn chút xíu, cậu nhắn lại nhé!";
                 saveHistory();
             }
         }
 
-        // --- HIỂN THỊ TIN NHẮN LÊN MÀN HÌNH CHAT ---
+        // HÀM ĐỌC TIẾNG VIỆT
+        function speakText(button, text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'vi-VN';
+            
+            utterance.onstart = () => { button.innerHTML = "<i class='fa-solid fa-volume-high'></i> Đang phát..."; button.style.color = "#2bc06a"; };
+            utterance.onend = () => { button.innerHTML = "<i class='fa-solid fa-volume-low'></i> Nghe tin nhắn"; button.style.color = "#1da1f2"; };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
         function appendMessage(sender, text, imageBase64 = null, textId = null) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `msg-row ${sender}`;
@@ -369,15 +428,14 @@
                 : document.getElementById('userAvatar').src;
 
             let contentHTML = "";
-            if (imageBase64) contentHTML += `<img src="${imageBase64}" alt="Sent Image" />`;
+            if (imageBase64) contentHTML += `<img src="${imageBase64}" />`;
             if (text) contentHTML += `<span ${textId ? `id="${textId}"` : ""}>${text}</span>`;
 
-            // Đoạn cấu trúc HTML chuẩn kết hợp nút Nghe tin nhắn như bản vẽ mẫu của bạn
             msgDiv.innerHTML = `
                 <img src="${avatarSrc}" class="avatar" alt="Avatar">
                 <div class="msg-content-area">
                     <div class="msg-bubble">${contentHTML}</div>
-                    ${sender === 'bot' && !textId ? `<button class="tts-btn">▶ Nghe tin nhắn</button>` : ''}
+                    ${sender === 'bot' && !textId ? `<button class="tts-btn" onclick="speakText(this, '${text.replace(/'/g, "\\'")}')"><i class='fa-solid fa-volume-low'></i> Nghe tin nhắn</button>` : ''}
                 </div>
             `;
             
