@@ -33,13 +33,13 @@ def send_alert(msg, reply, chat_id, role, token_id, student_name):
         print(f"Lỗi gửi Telegram: {e}", flush=True)
 
 # ==========================================
-# HÀM XỬ LÝ LỜI GỌI AI ĐỌC VỊ (GEMINI 2.5 FLASH)
+# HÀM XỬ LÝ LỜI GỌI AI ĐỌC VỊ (GEMINI FLASH)
 # ==========================================
 def get_ai_response(user_input, user_name, token_id):
     if not GEMINI_API_KEY:
         return {"level": "Safe", "reply": "Chưa cấu hình GEMINI_API_KEY trên server!"}
 
-    # System Prompt: Ngắn gọn, thấu cảm, xưng hô bằng Tên và ghi nhận Token ID
+    # System Prompt tối ưu hóa cấu trúc tư vấn học đường
     system_prompt = (
         f"Bạn là MindGuard, một người bạn tâm giao và trợ lý tâm lý học đường.\n"
         f"Người đang trò chuyện với bạn tên là {user_name} (Mã Token ID: {token_id}).\n"
@@ -62,34 +62,30 @@ def get_ai_response(user_input, user_name, token_id):
 
     try:
         model = genai.GenerativeModel(
-            model_name='gemini-2.5-flash',
+            model_name='gemini-1.5-flash',
             system_instruction=system_prompt
         )
         
-        response = model.generate_content(user_input, safety_settings=safety_settings)
-        text_resp = response.text.strip()
+        # Ép model luôn xuất ra JSON hợp lệ bằng cấu hình response_mime_type
+        response = model.generate_content(
+            user_input, 
+            safety_settings=safety_settings,
+            generation_config={"response_mime_type": "application/json"}
+        )
         
-        # Trích xuất chuỗi cấu trúc JSON
-        if "{" in text_resp and "}" in text_resp:
-            start = text_resp.find('{')
-            end = text_resp.rfind('}') + 1
-            return json.loads(text_resp[start:end])
-        else:
-            return {"level": "Safe", "reply": text_resp}
+        return json.loads(response.text.strip())
             
     except Exception as e:
         error_msg = str(e)
         print(f"Lỗi API Gemini: {error_msg}", flush=True)
-        
         if "429" in error_msg or "quota" in error_msg.lower():
             return {
                 "level": "Warning",
                 "reply": "MindGuard đang nhận được quá nhiều tin nhắn. Bạn đợi mình 1 phút rồi nhắn lại nhé! 💙"
             }
-            
         return {
             "level": "Safe",
-            "reply": f"Hệ thống đang bận hoặc gặp lỗi: {error_msg}"
+            "reply": f"Hệ thống đang gặp lỗi kết nối AI: {error_msg}"
         }
 
 # ==========================================
@@ -109,9 +105,9 @@ def chat():
         
         data = get_ai_response(user_msg, user_name, token_id)
         
-        # Gửi cảnh báo trực tiếp về mã token_id (Chat ID Telegram) mà người dùng đã nhập
+        # Gửi cảnh báo trực tiếp về Telegram cá nhân/giáo viên dựa vào token_id
         if data.get('level') == 'Danger':
-            send_alert(user_msg, data.get('reply'), token_id, "Người dùng/Giáo viên", token_id, user_name)
+            send_alert(user_msg, data.get('reply'), token_id, "Học sinh khẩn cấp", token_id, user_name)
             
         return jsonify(data)
     except Exception as e:
