@@ -2,248 +2,223 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MindGuard AI — Trợ lý Tâm lý</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindGuard AI — Trợ lý tâm lý</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #3b82f6, #06b6d4);
-            --bg-body: #e0f2fe; 
-            --glass-bg: rgba(255, 255, 255, 0.85); 
-            --glass-panel: rgba(255, 255, 255, 0.95);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text-main: #1e293b; 
-            --text-muted: #64748b; 
-            --safe-color: #10b981;
-            --shadow-soft: 0 20px 40px rgba(148, 163, 184, 0.15); 
-            --sidebar-bg: rgba(248, 250, 252, 0.95);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { 
-            background-color: var(--bg-body);
-            color: var(--text-main); 
-            display: flex; justify-content: center; 
-            align-items: center; height: 100vh; overflow: hidden;
-            position: relative;
+            display: flex; height: 100vh; background: linear-gradient(135deg, #eef5f9 0%, #dbe7f2 100%); 
+            justify-content: center; align-items: center; overflow: hidden; 
+        }
+        
+        /* App Container Bo Tròn Giống Ảnh Mẫu */
+        .app-window {
+            display: flex; width: 92vw; height: 88vh; background: #fff; 
+            border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.08); overflow: hidden;
         }
 
-        /* ----- Trang trí background lơ lửng ----- */
-        .bg-shape {
-            position: absolute; border-radius: 50%; filter: blur(80px);
-            z-index: -1; opacity: 0.7; animation: float 8s infinite ease-in-out alternate;
+        /* Sidebar Sáng Màu */
+        .sidebar { 
+            width: 280px; background-color: #f8fafc; padding: 24px; 
+            display: flex; flex-direction: column; gap: 20px; border-right: 1px solid #e2e8f0; 
         }
-        .shape-1 { width: 400px; height: 400px; background: #bae6fd; top: -10%; left: -5%; }
-        .shape-2 { width: 500px; height: 500px; background: #ccfbf1; bottom: -15%; right: -10%; animation-delay: -4s; }
-        @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(30px) scale(1.1); } }
+        
+        /* --- HIỆU ỨNG MASCOT MÈO CHẠY ĐỘNG --- */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .running-mascot {
+            width: 64px; 
+            height: 64px; 
+            background-image: url('image_0.png');
+            background-repeat: no-repeat;
+            background-size: auto 100%;
+            animation: play-friendly-mascot 0.7s steps(8) infinite;
+            image-rendering: pixelated; 
+        }
+        .logo-text { font-size: 22px; font-weight: bold; color: #1e88e5; }
+        @keyframes play-friendly-mascot {
+            from { background-position: 0px; }
+            to { background-position: -512px; }
+        }
 
-        /* ----- CONTAINER CHÍNH ----- */
-        .app-container {
-            display: flex; flex-direction: row; width: 100%; max-width: 1100px; height: 90vh;
-            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-soft); 
-            border: 1px solid rgba(255,255,255,0.8); position: relative;
+        .btn-new-chat { 
+            background: #fff; border: 1px solid #cbd5e1; color: #334155; padding: 12px; 
+            border-radius: 12px; cursor: pointer; text-align: left; font-size: 14px; 
+            font-weight: 500; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-
-        /* ----- SIDEBAR (Lịch sử giống Gemini) ----- */
-        .sidebar {
-            width: 280px; background: var(--sidebar-bg); border-right: 1px solid #e2e8f0;
-            display: flex; flex-direction: column; padding: 20px; z-index: 10;
-        }
-        .logo-area { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; margin-bottom: 30px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .logo-area i { color: #3b82f6; }
+        .btn-new-chat:hover { background: #f1f5f9; }
+        .sidebar-title { font-size: 11px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; margin-top: 10px; }
         
-        .btn-new-chat {
-            background: #ffffff; border: 1px solid #e2e8f0; color: var(--text-main);
-            padding: 12px 16px; border-radius: 12px; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; gap: 10px; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            margin-bottom: 20px;
-        }
-        .btn-new-chat:hover { background: #f1f5f9; border-color: #cbd5e1; transform: translateY(-1px); }
-        
-        .history-title { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .history-list { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
-        .history-list::-webkit-scrollbar { width: 4px; }
-        .history-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        .history-item {
-            padding: 12px; border-radius: 10px; cursor: pointer; font-size: 14px;
-            display: flex; align-items: center; gap: 12px; color: var(--text-main); transition: all 0.2s;
+        /* Vùng Danh Sách Lịch Sử Trò Chuyện Động */
+        .history-list { display: flex; flex-direction: column; gap: 6px; list-style: none; overflow-y: auto; flex: 1; }
+        .history-item { 
+            padding: 12px; border-radius: 10px; cursor: pointer; color: #475569; 
+            display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 14px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .history-item i { color: var(--text-muted); font-size: 16px; }
-        .history-item:hover { background: #e2e8f0; }
-        .history-item.active { background: #e0f2fe; color: #0284c7; font-weight: 500; }
-        .history-item.active i { color: #0ea5e9; }
+        .history-item:hover { background: #f1f5f9; color: #0f172a; }
+        .history-item.active { background: #e0f2fe; color: #0284c7; font-weight: 600; }
 
-        /* ----- MAIN CONTENT ----- */
-        .main-content {
-            flex: 1; display: flex; flex-direction: column; position: relative;
+        /* Khu vực Hồ Sơ Đổi Ảnh Đại Diện */
+        .user-profile-section {
+            border-top: 1px solid #e2e8f0; padding-top: 15px; display: flex; align-items: center; gap: 12px; position: relative;
+        }
+        .user-avatar-wrapper { position: relative; width: 44px; height: 44px; cursor: pointer; }
+        .user-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #1e88e5; }
+        .avatar-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+            background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center;
+            opacity: 0; transition: 0.2s; color: #fff; font-size: 12px;
+        }
+        .user-avatar-wrapper:hover .avatar-overlay { opacity: 1; }
+
+        /* Vùng hiển thị chính phía bên phải */
+        .main-chat-area { flex: 1; display: flex; flex-direction: column; position: relative; background: #fff; }
+
+        /* Form Nhập Thông Tin Đăng Nhập Ban Đầu */
+        .auth-container { 
+            position: absolute; inset: 0; background: #fff; display: flex; 
+            flex-direction: column; justify-content: center; align-items: center; z-index: 10; 
+        }
+        .auth-box { width: 380px; text-align: center; padding: 20px; }
+        .auth-box h2 { color: #1e88e5; margin-bottom: 20px; font-size: 26px; }
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #64748b; font-weight: 500; }
+        .form-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-size: 14px; }
+        .btn-submit { 
+            width: 100%; padding: 14px; background: #1e88e5; border: none; color: white; 
+            font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 10px; font-size: 15px;
         }
 
-        /* LOGIN SCREEN */
-        .login-screen { 
-            position: absolute; inset: 0; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(15px);
-            z-index: 50; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; 
-            transition: opacity 0.4s ease;
-        }
-        .login-box { 
-            background: var(--glass-panel); padding: 40px 30px; border-radius: 24px; width: 100%; max-width: 420px; 
-            border: 1px solid var(--glass-border); text-align: center; box-shadow: 0 15px 35px rgba(51, 65, 85, 0.1); 
-        }
-        .login-box h2 { font-size: 26px; margin-bottom: 12px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .login-box p { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
-        .login-group { margin-bottom: 20px; text-align: left; }
-        .login-group label { display: block; font-size: 13px; color: var(--text-main); margin-bottom: 8px; font-weight: 600;}
-        .login-group input { width: 100%; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 14px; color: var(--text-main); font-size: 15px; outline: none; }
-        .login-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
-        .btn-login { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; font-size: 15px; transition: 0.2s; }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25); }
-
-        /* CHAT UI */
-        .chat-ui-wrapper { display: none; flex-direction: column; height: 100%; position: relative; }
-        
+        /* Khung Đầu Chat (Đã xóa chữ "Phiên tư vấn tâm lý") */
         .chat-header { 
-            padding: 16px 24px; background: rgba(255, 255, 255, 0.7); border-bottom: 1px solid #e2e8f0; 
-            display: flex; align-items: center; justify-content: space-between; z-index: 5;
+            padding: 18px 24px; border-bottom: 1px solid #f1f5f9; 
+            display: flex; align-items: center; gap: 8px; background: #fff;
         }
-        .header-left h1 { font-size: 18px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;}
-        .status-dot { font-size: 12px; color: var(--safe-color); display: flex; align-items: center; gap: 6px; font-weight: 500; margin-top: 4px;}
+        .status-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; }
+        .status-text { font-size: 14px; color: #22c55e; font-weight: 600; }
+
+        /* Vùng Nội Dung Chat có Hình Nền Sóng Biển Ẩn Mờ */
+        .chat-messages-container { 
+            flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; 
+            background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000') no-repeat center center;
+            background-size: cover;
+        }
         
-        /* KHU VỰC TIN NHẮN (CÓ ẢNH NỀN) */
-        .chat-messages { 
-            flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; 
-            scroll-behavior: smooth; position: relative; z-index: 1;
-        }
-        /* Lớp phủ ảnh nền thiên nhiên nhẹ nhàng */
-        .chat-messages::before {
-            content: ""; position: absolute; inset: 0; z-index: -2;
-            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop'); 
-            background-size: cover; background-position: center; opacity: 0.15; /* Làm mờ ảnh để không rối chữ */
-            pointer-events: none;
-        }
-        .chat-messages::-webkit-scrollbar { width: 6px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .msg-row { display: flex; gap: 12px; max-width: 80%; }
+        .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+        .msg-row.bot { align-self: flex-start; }
+
+        .msg-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        .msg-bubble { padding: 12px 16px; border-radius: 16px; line-height: 1.5; font-size: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+        .msg-row.user .msg-bubble { background: #0084ff; color: #fff; border-top-right-radius: 2px; }
+        .msg-row.bot .msg-bubble { background: #fff; color: #1e293b; border-top-left-radius: 2px; border: 1px solid #e2e8f0; }
         
-        /* NHÂN VẬT MINDGUARD (ANIMATION) */
-        .mascot-mindguard {
-            position: absolute; bottom: 30px; left: -50px; z-index: -1;
-            font-size: 45px; color: #3b82f6; opacity: 0.4;
-            pointer-events: none; /* Không cản trở click chuột */
-            animation: walkAround 20s linear infinite;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-        }
-        .mascot-shadow { width: 30px; height: 8px; background: rgba(0,0,0,0.1); border-radius: 50%; filter: blur(2px); }
-        
-        @keyframes walkAround {
-            0%   { transform: translateX(-50px) scaleX(1); bottom: 10%; }
-            45%  { transform: translateX(calc(100vw - 400px)) scaleX(1); bottom: 30%; }
-            50%  { transform: translateX(calc(100vw - 400px)) scaleX(-1); bottom: 30%; }
-            95%  { transform: translateX(-50px) scaleX(-1); bottom: 10%; }
-            100% { transform: translateX(-50px) scaleX(1); bottom: 10%; }
+        /* Nút phát âm thanh giả lập giống trong ảnh */
+        .audio-btn {
+            display: inline-flex; align-items: center; gap: 6px; background: #f1f5f9; border: none;
+            padding: 6px 12px; border-radius: 20px; font-size: 12px; color: #1e88e5; cursor: pointer; margin-top: 6px; font-weight: 500;
         }
 
-        .message { display: flex; gap: 14px; max-width: 85%; animation: fadeIn 0.4s ease; z-index: 2;}
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .message.bot { align-self: flex-start; }
-        .message.user { align-self: flex-end; flex-direction: row-reverse; }
-        
-        .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.08); background: white;}
-        .bot .avatar { background: var(--primary-gradient); color: white; }
-        .user .avatar { color: #3b82f6; border: 1px solid #e2e8f0;}
-        
-        .message-info { display: flex; flex-direction: column; gap: 6px; max-width: 100%; }
-        .sender-name { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-        .user .sender-name { text-align: right; }
-        
-        .message-content { padding: 14px 18px; border-radius: 18px; font-size: 15px; line-height: 1.6; word-break: break-word; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .bot .message-content { background: rgba(255, 255, 255, 0.95); border: 1px solid #e2e8f0; border-top-left-radius: 4px; color: var(--text-main); }
-        .user .message-content { background: var(--primary-gradient); color: #ffffff; border-top-right-radius: 4px; }
-        
-        .btn-play-voice {
-            background: #f1f5f9; border: 1px solid #e2e8f0; color: #0ea5e9; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; display: inline-flex; align-items: center; gap: 8px;
+        /* Khung Xem Trước Ảnh Trước Khi Gửi */
+        .preview-box { 
+            display: none; padding: 8px 24px; background: #f8fafc; 
+            border-top: 1px solid #f1f5f9; align-items: center; gap: 10px; 
         }
-        .btn-play-voice:hover { background: #e0f2fe; color: #0284c7; }
-        .btn-play-voice.playing { background: var(--primary-gradient); color: white; border: none; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); } 70% { box-shadow: 0 0 0 10px rgba(59,130,246,0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); } }
+        .preview-img { height: 50px; border-radius: 6px; border: 1px solid #cbd5e1; }
+        .cancel-img-btn { color: #ef4444; cursor: pointer; font-size: 18px; }
 
-        .chat-input-area { padding: 20px 24px; background: rgba(255, 255, 255, 0.85); border-top: 1px solid #e2e8f0; display: flex; gap: 12px; align-items: center; z-index: 5;}
-        .chat-input-area input { flex: 1; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 24px; padding: 15px 24px; color: var(--text-main); font-size: 15px; outline: none; }
-        .chat-input-area input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
-        .chat-input-area button { background: var(--primary-gradient); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
-        .chat-input-area button:hover { transform: scale(1.05); }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none; } /* Ẩn sidebar trên mobile */
-            .app-container { height: 100vh; height: 100dvh; max-width: 100%; border-radius: 0; border: none; }
-            .login-box { border-radius: 0; height: 100%; display: flex; flex-direction: column; justify-content: center; }
-            .chat-messages { padding: 16px; gap: 16px; }
-            .chat-input-area { padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+        /* Khung Nhập Tin Nhắn Dạng Viên Thuốc (Pill Shape) */
+        .chat-input-wrapper { padding: 16px 24px; background: #fff; border-top: 1px solid #f1f5f9; }
+        .pill-input-bar { 
+            display: flex; align-items: center; background: #f1f5f9; 
+            border-radius: 30px; padding: 6px 10px 6px 18px; gap: 12px; 
         }
+        .pill-input-bar input { 
+            flex: 1; background: none; border: none; outline: none; 
+            font-size: 15px; color: #334155; padding: 8px 0; 
+        }
+        .icon-btn { color: #64748b; font-size: 20px; cursor: pointer; transition: 0.2s; padding: 4px; }
+        .icon-btn:hover { color: #1e88e5; }
+        .btn-send-pill { 
+            background: #1e88e5; color: white; border: none; width: 38px; height: 38px; 
+            border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s;
+        }
+        .btn-send-pill:hover { background: #1565c0; }
+        
+        .chat-attached-img { max-width: 200px; border-radius: 10px; margin-bottom: 6px; display: block; }
     </style>
 </head>
 <body>
 
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
-
-    <div class="app-container">
-        
+    <div class="app-window">
         <div class="sidebar">
-            <div class="logo-area">
-                <i class="fa-solid fa-shield-halved"></i> MindGuard
+            <div class="logo-container">
+                <div class="running-mascot"></div>
+                <span class="logo-text">MindGuard</span>
             </div>
-            <button class="btn-new-chat" onclick="alert('Tính năng đang phát triển!')">
-                <i class="fa-solid fa-plus"></i> Cuộc trò chuyện mới
-            </button>
-            <div class="history-title">Gần đây</div>
-            <div class="history-list">
-                <div class="history-item active"><i class="fa-regular fa-message"></i> Phiên chat hiện tại</div>
-                <div class="history-item"><i class="fa-regular fa-message"></i> Cách vượt qua áp lực...</div>
-                <div class="history-item"><i class="fa-regular fa-message"></i> Gợi ý nhạc thư giãn</div>
-                <div class="history-item"><i class="fa-regular fa-message"></i> Nhật ký cảm xúc hôm qua</div>
+            
+            <button class="btn-new-chat" onclick="startNewChatSession()"><i class="fas fa-plus"></i> Cuộc trò chuyện mới</button>
+            
+            <div class="sidebar-title">LỊCH SỬ TRÒ CHUYỆN</div>
+            <ul class="history-list" id="chatHistoryList"></ul>
+
+            <div class="user-profile-section" id="profileArea" style="display:none;">
+                <div class="user-avatar-wrapper" onclick="document.getElementById('avatarUploader').click()">
+                    <img id="userDisplayAvatar" class="user-avatar" src="https://api.dicebear.com/7.x/lorelei/svg?seed=user" alt="Avatar">
+                    <div class="avatar-overlay"><i class="fas fa-camera"></i></div>
+                </div>
+                <div>
+                    <div id="lblUserName" style="font-weight: 600; color: #1e293b; font-size: 14px;">Học sinh</div>
+                    <div style="font-size: 11px; color: #94a3b8;">Click để đổi ảnh</div>
+                </div>
+                <input type="file" id="avatarUploader" accept="image/*" style="display:none;" onchange="changeUserAvatar(this)">
             </div>
         </div>
 
-        <div class="main-content">
+        <div class="main-chat-area">
             
-            <div class="login-screen" id="loginScreen">
-                <div class="login-box">
-                    <h2><i class="fa-solid fa-shield-halved"></i> MindGuard</h2>
-                    <p>Không gian an toàn để bạn chia sẻ mọi suy nghĩ. Vui lòng nhập thông tin để kết nối.</p>
-                    <div class="login-group">
+            <div id="authBox" class="auth-container">
+                <div class="auth-box">
+                    <h2>Kết nối MindGuard</h2>
+                    <div class="form-group">
                         <label>Tên gọi của bạn</label>
-                        <input type="text" id="initName" placeholder="Ví dụ: Hoàng Đức" onkeypress="if(event.key==='Enter') startSystem()">
+                        <input type="text" id="username" placeholder="Ví dụ: Thịnh">
                     </div>
-                    <div class="login-group">
-                        <label>Mã Token (Chat ID Telegram)</label>
-                        <input type="number" id="initTokenId" placeholder="Ví dụ: 5871531291" onkeypress="if(event.key==='Enter') startSystem()">
+                    <div class="form-group">
+                        <label>Mã Chat ID Telegram cá nhân của bạn</label>
+                        <input type="text" id="tokenId" placeholder="Ví dụ: 5871531291">
                     </div>
-                    <button class="btn-login" onclick="startSystem()">BẮT ĐẦU TRÒ CHUYỆN</button>
+                    <button class="btn-submit" onclick="handleLoginSubmit()">BẮT ĐẦU TRÒ CHUYỆN</button>
                 </div>
             </div>
 
-            <div class="chat-ui-wrapper" id="chatUiWrapper">
-                <div class="chat-header">
-                    <div class="header-left">
-                        <h1>Phiên tư vấn tâm lý</h1>
-                        <div class="status-dot"><i class="fa-solid fa-circle"></i> MindGuard Trực tuyến</div>
-                    </div>
-                </div>
+            <div class="chat-header">
+                <div class="status-dot"></div>
+                <div class="status-text">MindGuard Trực tuyến</div>
+            </div>
 
-                <div class="chat-messages" id="chatContainer">
-                    <div class="mascot-mindguard">
-                        <i class="fa-solid fa-robot"></i>
-                        <div class="mascot-shadow"></div>
-                    </div>
-                </div>
+            <div class="chat-messages-container" id="chatMessagesBox"></div>
 
-                <div class="chat-input-area">
-                    <input type="text" id="userInput" placeholder="Nhắn tin cho MindGuard..." autocomplete="off" onkeypress="if(event.key==='Enter') sendTextMessage()">
-                    <button onclick="sendTextMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            <div class="preview-box" id="imagePreviewContainer">
+                <img src="" id="imgPreviewSource" class="preview-img">
+                <i class="fas fa-times-circle cancel-img-btn" onclick="clearAttachedImage()"></i>
+                <span style="font-size: 12px; color: #64748b;">Ảnh đã được đính kèm thành công</span>
+            </div>
+
+            <div class="chat-input-wrapper">
+                <div class="pill-input-bar">
+                    <i class="far fa-image icon-btn" title="Đính kèm hình ảnh" onclick="document.getElementById('chatImageUploader').click()"></i>
+                    <input type="file" id="chatImageUploader" accept="image/*" style="display:none;" onchange="handleChatImageSelect(this)">
+                    
+                    <input type="text" id="chatTextInput" placeholder="Nhắn tin cho MindGuard..." onkeypress="if(event.key === 'Enter') triggerSendMessage()">
+                    
+                    <button class="btn-send-pill" onclick="triggerSendMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
 
@@ -251,119 +226,172 @@
     </div>
 
     <script>
-        const loginScreen = document.getElementById('loginScreen');
-        const chatUiWrapper = document.getElementById('chatUiWrapper');
-        const chatContainer = document.getElementById('chatContainer');
-        
-        let userInfo = { name: "", tokenId: "" };
+        let currentUser = { name: '', token: '', avatar: 'https://api.dicebear.com/7.x/lorelei/svg?seed=Thinh' };
+        let conversations = {}; 
+        let activeChatId = null;
+        let attachedImageBase64 = null;
 
-        function startSystem() {
-            const nameInput = document.getElementById('initName').value.trim();
-            const tokenInput = document.getElementById('initTokenId').value.trim();
-            if (!nameInput || !tokenInput) { alert("Vui lòng nhập đầy đủ thông tin để tiếp tục nhé!"); return; }
+        function handleLoginSubmit() {
+            const name = document.getElementById('username').value.trim();
+            const token = document.getElementById('tokenId').value.trim();
+            if (!name || !token) { alert("Vui lòng điền đủ thông tin nha!"); return; }
 
-            userInfo.name = nameInput;
-            userInfo.tokenId = tokenInput;
+            currentUser.name = name;
+            currentUser.token = token;
+            
+            document.getElementById('lblUserName').innerText = name;
+            document.getElementById('userDisplayAvatar').src = currentUser.avatar;
+            document.getElementById('profileArea').style.display = 'flex';
+            document.getElementById('authBox').style.display = 'none';
 
-            loginScreen.style.opacity = '0';
-            setTimeout(() => {
-                loginScreen.style.display = 'none';
-                chatUiWrapper.style.display = 'flex';
-                appendMessage(`Xin chào **${userInfo.name}**! Mình đang ở đây và sẵn sàng lắng nghe bạn. Hôm nay bạn cảm thấy thế nào?`, 'bot');
-            }, 400);
+            startNewChatSession();
         }
 
-        function playVoiceMessage(textId, btnElement) {
-            if (!('speechSynthesis' in window)) {
-                alert("Rất tiếc, trình duyệt của bạn không hỗ trợ đọc giọng nói."); return;
+        function changeUserAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentUser.avatar = e.target.result;
+                    document.getElementById('userDisplayAvatar').src = e.target.result;
+                    document.querySelectorAll('.msg-row.user .msg-avatar').forEach(img => img.src = e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
             }
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-                document.querySelectorAll('.btn-play-voice').forEach(b => {
-                    b.innerHTML = '<i class="fa-solid fa-play"></i> Nghe tin nhắn'; b.classList.remove('playing');
-                });
-                if (btnElement.classList.contains('playing')) return;
-            }
+        }
 
-            const rawText = document.getElementById(textId).innerText;
-            const cleanText = rawText.replace(/[*#_]/g, ''); 
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.lang = 'vi-VN';
+        function startNewChatSession() {
+            const chatId = 'chat_' + Date.now();
+            const timeStr = new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
             
-            btnElement.innerHTML = '<i class="fa-solid fa-stop"></i> Đang phát...';
-            btnElement.classList.add('playing');
-
-            utterance.onend = function() {
-                btnElement.innerHTML = '<i class="fa-solid fa-play"></i> Nghe tin nhắn';
-                btnElement.classList.remove('playing');
+            conversations[chatId] = {
+                title: `Trò chuyện lúc ${timeStr}`,
+                messages: [
+                    { sender: 'bot', text: `Ui xin chào bạn nha! Mình là MindGuard đây, hôm nay cậu có chuyện gì muốn trút bầu tâm sự với mình không nè?` }
+                ]
             };
-            window.speechSynthesis.speak(utterance);
+
+            activeChatId = chatId;
+            renderHistorySidebar();
+            loadActiveChatMessages();
         }
 
-        function scrollToBottom() { chatContainer.scrollTop = chatContainer.scrollHeight; }
-
-        function appendMessage(text, sender) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
-            const textId = 'msg-text-' + Date.now() + Math.floor(Math.random() * 100);
-
-            let avatarHtml = sender === 'bot' 
-                ? `<div class="avatar"><i class="fa-solid fa-leaf"></i></div>` 
-                : `<div class="avatar"><i class="fa-solid fa-user"></i></div>`;
+        function renderHistorySidebar() {
+            const listEl = document.getElementById('chatHistoryList');
+            listEl.innerHTML = '';
             
-            let nameHtml = sender === 'bot' 
-                ? `<span class="sender-name">MindGuard</span>` 
-                : `<span class="sender-name">${userInfo.name}</span>`;
+            Object.keys(conversations).forEach(id => {
+                const li = document.createElement('li');
+                li.className = `history-item ${id === activeChatId ? 'active' : ''}`;
+                li.onclick = () => { activeChatId = id; renderHistorySidebar(); loadActiveChatMessages(); };
+                li.innerHTML = `<i class="far fa-comment"></i> ${conversations[id].title}`;
+                listEl.appendChild(li);
+            });
+        }
 
-            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-            let contentHtml = `<div class="message-content"><div id="${textId}">${formattedText}</div>`;
+        function loadActiveChatMessages() {
+            const box = document.getElementById('chatMessagesBox');
+            box.innerHTML = '';
             
-            if (sender === 'bot') {
-                contentHtml += `<button class="btn-play-voice" onclick="playVoiceMessage('${textId}', this)">
-                                    <i class="fa-solid fa-play"></i> Nghe tin nhắn
-                                </button>`;
+            const currentMessages = conversations[activeChatId].messages;
+            currentMessages.forEach(msg => {
+                appendMessageToUI(msg.text, msg.sender, msg.imgSrc, false);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function handleChatImageSelect(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    attachedImageBase64 = e.target.result;
+                    document.getElementById('imgPreviewSource').src = e.target.result;
+                    document.getElementById('imagePreviewContainer').style.display = 'flex';
+                }
+                reader.readAsDataURL(input.files[0]);
             }
-            contentHtml += `</div>`;
-
-            msgDiv.innerHTML = `${avatarHtml}<div class="message-info">${nameHtml}${contentHtml}</div>`;
-            chatContainer.appendChild(msgDiv);
-            scrollToBottom();
         }
 
-        function appendLoadingBot() {
-            const loadDiv = document.createElement('div');
-            loadDiv.className = 'message bot'; loadDiv.id = 'botLoadingTemp';
-            loadDiv.innerHTML = `<div class="avatar"><i class="fa-solid fa-leaf"></i></div>
-                                 <div class="message-info"><span class="sender-name">MindGuard</span>
-                                 <div class="message-content" style="display: flex; gap: 8px; align-items: center;">
-                                    Đang suy nghĩ... <i class="fa-solid fa-spinner fa-spin"></i>
-                                 </div></div>`;
-            chatContainer.appendChild(loadDiv);
-            scrollToBottom();
+        function clearAttachedImage() {
+            attachedImageBase64 = null;
+            document.getElementById('chatImageUploader').value = '';
+            document.getElementById('imagePreviewContainer').style.display = 'none';
         }
-        function removeLoadingBot() { const loadDiv = document.getElementById('botLoadingTemp'); if (loadDiv) loadDiv.remove(); }
 
-        async function sendTextMessage() {
-            const input = document.getElementById('userInput');
-            const message = input.value.trim();
-            if (!message) return;
+        async function triggerSendMessage() {
+            const inputEl = document.getElementById('chatTextInput');
+            const text = inputEl.value.trim();
+            
+            if (!text && !attachedImageBase64) return;
 
-            appendMessage(message, 'user');
-            input.value = '';
-            appendLoadingBot();
+            conversations[activeChatId].messages.push({
+                sender: 'user',
+                text: text,
+                imgSrc: attachedImageBase64
+            });
+
+            appendMessageToUI(text, 'user', attachedImageBase64, true);
+            
+            const imgToSend = attachedImageBase64;
+            inputEl.value = '';
+            clearAttachedImage();
 
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message, user_name: userInfo.name, token_id: userInfo.tokenId })
+                    body: JSON.stringify({
+                        message: text,
+                        user_name: currentUser.name,
+                        token_id: currentUser.token,
+                        image: imgToSend
+                    })
                 });
+
                 const data = await response.json();
-                removeLoadingBot();
-                appendMessage(data.reply, 'bot');
+                
+                conversations[activeChatId].messages.push({ sender: 'bot', text: data.reply });
+                appendMessageToUI(data.reply, 'bot', null, true);
+
             } catch (err) {
-                removeLoadingBot();
-                appendMessage("❌ Máy chủ đang bận hoặc không phản hồi. Bạn vui lòng thử lại sau nhé.", 'bot');
+                appendMessageToUI("Haizz, mạng mẽo chán quá đi mất, cậu gửi lại tin nhắn vừa rồi nha.", 'bot', null, true);
+            }
+        }
+
+        function appendMessageToUI(text, sender, imgSrc = null, scroll = true) {
+            const box = document.getElementById('chatMessagesBox');
+            const row = document.createElement('div');
+            row.className = `msg-row ${sender}`;
+            
+            const avatarSrc = (sender === 'user') ? currentUser.avatar : 'https://api.dicebear.com/7.x/bottts/svg?seed=MindGuard';
+            
+            let imgHtml = '';
+            if (imgSrc) { imgHtml = `<img src="${imgSrc}" class="chat-attached-img" />`; }
+
+            let audioBtnHtml = '';
+            if (sender === 'bot') {
+                audioBtnHtml = `<br><button class="audio-btn" onclick="mockSpeak('${text.replace(/'|"/g, '')}')"><i class="fas fa-play"></i> Nghe tin nhắn</button>`;
+            }
+
+            row.innerHTML = `
+                <img class="msg-avatar" src="${avatarSrc}">
+                <div class="msg-bubble">
+                    ${imgHtml}
+                    <div>${text}</div>
+                    ${audioBtnHtml}
+                </div>
+            `;
+            
+            box.appendChild(row);
+            if (scroll) box.scrollTop = box.scrollHeight;
+        }
+
+        function mockSpeak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'vi-VN';
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Trình duyệt không hỗ trợ đọc giọng nói mất rồi!");
             }
         }
     </script>
