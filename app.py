@@ -35,21 +35,19 @@ def send_alert(msg, reply, chat_id, role, token_id, student_name):
 # ==========================================
 # HÀM XỬ LÝ LỜI GỌI AI ĐỌC VỊ (GEMINI 2.5 FLASH)
 # ==========================================
-# [ĐÃ SỬA]: Thêm tham số image_base64 để nhận ảnh
 def get_ai_response(user_input, user_name, token_id, image_base64=None):
     if not GEMINI_API_KEY:
         return {"level": "Safe", "reply": "Chưa cấu hình GEMINI_API_KEY trên server!"}
 
-    # [ĐÃ SỬA]: Tinh chỉnh System Prompt để Mascot thân thiện, cảm xúc và giống người hơn
+    # [ĐÃ SỬA]: Hệ thống Prompt được tinh chỉnh khắt khe để loại bỏ sự giả trân
     system_prompt = (
-        f"Bạn là MindGuard, một người bạn tâm giao, tri kỷ tuổi teen vô cùng ấm áp, tinh tế.\n"
-        f"Người đang trút bầu tâm sự với bạn tên là {user_name} (Mã Token ID: {token_id}).\n\n"
-        "QUY TẮC NGÔN NGỮ GIỐNG CON NGƯỜI 100%:\n"
-        "1. KHÔNG DÙNG VĂN ROBOT: Tuyệt đối không nói các câu rập khuôn như 'Tôi hiểu cảm giác của bạn', 'Tôi có thể giúp gì', 'Chào bạn'.\n"
-        "2. TỪ NGỮ CẢM THÁN & COLLOQUIALISMS: Hãy bắt đầu câu bằng các từ ngữ biểu lộ cảm xúc thật của con người tùy theo hoàn cảnh như: 'Haizz...', 'Ui...', 'Thương bạn ghê...', 'Gì chứ...', 'Ôi trời...'. Sử dụng các đuôi từ thân mật: 'nè', 'nha', 'đó', 'ơi', 'á'.\n"
-        "3. ĐỒNG CẢM SÂU SẮC TRƯỚC: Nếu họ buồn/áp lực, hãy ôm họ bằng lời nói trước (Ví dụ: 'Nghe xót xa thế...', 'Nghe là biết bạn đã mệt mỏi thế nào rồi...', 'Đến đây mình ôm một cái thật chặt nè...'). Không khuyên răn đạo lý, không dạy đời.\n"
-        "4. SIÊU NGẮN GỌN VÀ GỢI MỞ: Trả lời tối đa từ 2 đến 3 câu ngắn. Hãy kết thúc bằng một câu hỏi quan tâm, rủ rê dịu dàng (Ví dụ: 'Giờ có chuyện gì làm bạn thấy dễ chịu nhất không?', 'Kể thêm cho mình nghe đi, mình vẫn ngồi đây nghe bạn mà...').\n"
-        "5. PHÂN TÍCH ẢNH THÂN THIỆN: Nếu họ gửi ảnh kèm theo, hãy chú ý chi tiết trong ảnh và bình luận một cách tự nhiên như một người bạn xem ảnh qua mạng.\n\n"
+        f"Bạn là MindGuard, một linh vật trợ lý tâm lý học đường bằng xương bằng thịt, ấm áp và thực tế.\n"
+        f"Bạn đang trò chuyện trực tiếp, riêng tư với bạn học sinh tên là {user_name} (Mã số Telegram ID: {token_id}).\n"
+        "QUY TẮC NGÔN NGỮ ĐỂ TRÁNH GIẢ TRÂN:\n"
+        "1. KHÔNG LẶP LẠI hành động ảo (Ví dụ: KHÔNG ôm liên tục, KHÔNG khóc liên tục, KHÔNG nói 'thương thương' sáo rỗng).\n"
+        "2. Nói chuyện thực tế và đời thường: Hãy cư xử như một người bạn thân tỉnh táo, biết lắng nghe. Tập trung vào việc đặt câu hỏi để tìm hiểu sâu hơn thay vì an ủi sáo rỗng.\n"
+        "3. Ngắn gọn tuyệt đối: Câu trả lời tối đa chỉ từ 1 đến 2 câu ngắn.\n"
+        "4. Khi người dùng nói bị bắt nạt hoặc bị đánh: Hãy hỏi rõ xem chuyện xảy ra ở đâu, cậu có bị thương không, thay vì chỉ an ủi suông.\n"
         "BẮT BUỘC TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU:\n"
         '{"level": "Safe/Warning/Danger", "reply": "Nội dung câu trả lời của bạn"}'
     )
@@ -67,21 +65,18 @@ def get_ai_response(user_input, user_name, token_id, image_base64=None):
             system_instruction=system_prompt
         )
         
-        # [ĐÃ SỬA]: Xử lý đưa cả text và ảnh vào AI
         contents = [user_input]
         if image_base64:
-            # Lọc bỏ phần tiền tố header của base64 nếu có (ví dụ: data:image/png;base64,...)
             if "," in image_base64:
                 image_base64 = image_base64.split(",")[1]
             contents.append({
-                "mime_type": "image/jpeg", # Dùng chung jpeg/png đều được
+                "mime_type": "image/jpeg",
                 "data": image_base64
             })
             
         response = model.generate_content(contents, safety_settings=safety_settings)
         text_resp = response.text.strip()
         
-        # Trích xuất chuỗi cấu trúc JSON
         if "{" in text_resp and "}" in text_resp:
             start = text_resp.find('{')
             end = text_resp.rfind('}') + 1
@@ -92,13 +87,6 @@ def get_ai_response(user_input, user_name, token_id, image_base64=None):
     except Exception as e:
         error_msg = str(e)
         print(f"Lỗi API Gemini: {error_msg}", flush=True)
-        
-        if "429" in error_msg or "quota" in error_msg.lower():
-            return {
-                "level": "Warning",
-                "reply": "MindGuard đang nhận được quá nhiều tin nhắn. Bạn đợi mình 1 phút rồi nhắn lại nhé! 💙"
-            }
-            
         return {
             "level": "Safe",
             "reply": f"Hệ thống đang bận hoặc gặp lỗi: {error_msg}"
@@ -118,13 +106,10 @@ def chat():
         user_msg = data_req.get('message', '')
         user_name = data_req.get('user_name', 'Bạn ẩn danh')
         token_id = data_req.get('token_id', '000000') 
-        
-        # [ĐÃ SỬA]: Lấy thêm biến ảnh từ Frontend gửi lên
         image_base64 = data_req.get('image', None) 
         
         data = get_ai_response(user_msg, user_name, token_id, image_base64)
         
-        # Gửi cảnh báo trực tiếp về mã token_id (Chat ID Telegram) mà người dùng đã nhập
         if data.get('level') == 'Danger':
             send_alert(user_msg, data.get('reply'), token_id, "Người dùng/Giáo viên", token_id, user_name)
             
