@@ -8,7 +8,6 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        /* Hình nền bờ biển thư giãn toàn màn hình */
         body { 
             display: flex; 
             height: 100vh; 
@@ -18,20 +17,15 @@
             position: relative; 
         }
 
-        /* -----------------------------------------
-           POPUP NHẬP THÔNG TIN (GLASSMORPHISM)
-        ----------------------------------------- */
         .login-overlay { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
             background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             display: flex; align-items: center; justify-content: center; 
             z-index: 9999; transition: 0.3s ease; 
         }
         .login-box { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);
             padding: 35px; border-radius: 24px; width: 90%; max-width: 400px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center;
             border: 1px solid rgba(255,255,255,0.4);
@@ -46,32 +40,21 @@
         }
         .login-input:focus { border-color: #1da1f2; background: white; box-shadow: 0 0 10px rgba(29,161,242,0.15); }
         .login-btn { 
-            width: 100%; padding: 14px; 
-            background: linear-gradient(135deg, #1da1f2, #0084b4); 
+            width: 100%; padding: 14px; background: linear-gradient(135deg, #1da1f2, #0084b4); 
             color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; 
             cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(29,161,242,0.3);
         }
         .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(29,161,242,0.4); }
 
-        /* -----------------------------------------
-           SIDEBAR (THANH BÊN TRÁI HIỆU ỨNG KÍNH)
-        ----------------------------------------- */
         .sidebar { 
-            width: 300px; 
-            background: rgba(255, 255, 255, 0.45); 
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            padding: 25px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            border-right: 1px solid rgba(255, 255, 255, 0.3);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 999;
+            width: 300px; background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); padding: 25px 20px; display: flex; 
+            flex-direction: column; border-right: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999;
         }
         .logo-container { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
         .logo-icon { 
-            width: 36px; height: 36px; 
-            background: linear-gradient(135deg, #1da1f2, #005f87); 
+            width: 36px; height: 36px; background: linear-gradient(135deg, #1da1f2, #005f87); 
             color: white; display: flex; align-items: center; justify-content: center; 
             border-radius: 12px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 10px rgba(29,161,242,0.3);
         }
@@ -88,14 +71,14 @@
         .history-title { font-size: 11px; font-weight: 700; color: #657786; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
         .history-list { flex: 1; overflow-y: auto; }
         .history-item { 
-            padding: 12px 15px; background: rgba(29, 161, 242, 0.12); 
-            border-radius: 12px; font-size: 14px; color: #117cb4; font-weight: 600; 
+            padding: 12px 15px; background: rgba(255, 255, 255, 0.5); 
+            border-radius: 12px; font-size: 14px; color: #2c3e50; font-weight: 600; 
             cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;
-            transition: 0.2s; border: 1px solid rgba(29, 161, 242, 0.05);
+            transition: 0.2s; border: 1px solid rgba(255, 255, 255, 0.4);
         }
-        .history-item:hover { background: rgba(29, 161, 242, 0.2); transform: translateX(2px); }
+        .history-item.active { background: rgba(29, 161, 242, 0.15); border-color: rgba(29, 161, 242, 0.3); color: #117cb4; }
+        .history-item:hover { background: rgba(29, 161, 242, 0.1); transform: translateX(2px); }
         
-        /* Thông tin người dùng nâng cấp mượt hơn */
         .user-profile { 
             display: flex; align-items: center; gap: 12px; padding-top: 18px; 
             border-top: 1px solid rgba(0,0,0,0.06); cursor: pointer; transition: 0.2s;
@@ -106,21 +89,13 @@
         .user-name { font-size: 15px; font-weight: 700; color: #2c3e50; text-transform: capitalize; }
         .user-sub { font-size: 11px; color: #657786; margin-top: 1px; }
 
-        /* -----------------------------------------
-           KHUNG CHAT PHẢI (HIỆU ỨNG HỘP KÍNH)
-        ----------------------------------------- */
         .main-chat { flex: 1; display: flex; flex-direction: column; position: relative; padding: 15px 20px 20px 20px; }
-        
-        /* Hộp chat bo góc lơ lửng trên màn hình nền */
         .chat-container-inner {
-            flex: 1; display: flex; flex-direction: column;
-            background: rgba(255, 255, 255, 0.65);
+            flex: 1; display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-radius: 24px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.4);
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
         }
-
         .chat-header { 
             padding: 18px 25px; background: rgba(255, 255, 255, 0.4); 
             border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 700; 
@@ -129,7 +104,6 @@
         .status-dot { width: 9px; height: 9px; background: #2bc06a; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #2bc06a; }
         .menu-toggle { display: none; background: none; border: none; font-size: 22px; cursor: pointer; color: #2c3e50; margin-right: 5px; }
 
-        /* Vùng hiển thị tin nhắn */
         .messages-box { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; }
         .msg-row { display: flex; align-items: flex-start; gap: 14px; max-width: 75%; }
         .msg-row.bot { align-self: flex-start; }
@@ -138,52 +112,38 @@
         .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 2px solid white; }
         .msg-content-area { display: flex; flex-direction: column; gap: 6px; }
         
-        /* Bong bóng chat bo góc thẩm mỹ cao */
         .msg-bubble { 
             padding: 14px 20px; border-radius: 20px; font-size: 15px; line-height: 1.5; 
             word-wrap: break-word; white-space: pre-line; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        .bot .msg-bubble { 
-            background: white; color: #2c3e50; border-top-left-radius: 4px; 
-            border: 1px solid rgba(0,0,0,0.02);
-        }
-        .user .msg-bubble { 
-            background: linear-gradient(135deg, #1da1f2, #0084b4); color: white; border-top-right-radius: 4px; 
-        }
+        .bot .msg-bubble { background: white; color: #2c3e50; border-top-left-radius: 4px; border: 1px solid rgba(0,0,0,0.02); }
+        .user .msg-bubble { background: linear-gradient(135deg, #1da1f2, #0084b4); color: white; border-top-right-radius: 4px; }
         .msg-bubble img { max-width: 100%; max-height: 220px; border-radius: 12px; margin-bottom: 8px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
-        /* Nút Nghe tin nhắn thiết kế hiện đại kèm Icon */
         .tts-btn { 
             background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(29,161,242,0.15); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #1da1f2; 
             cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; width: fit-content; margin-top: 3px; transition: 0.2s;
         }
         .tts-btn:hover { background: #1da1f2; color: white; transform: scale(1.02); }
 
-        /* -----------------------------------------
-           INPUT AREA (THANH GÕ TIN NHẮN TẬP TRUNG)
-        ----------------------------------------- */
         .input-area { padding: 15px 25px 20px 25px; background: rgba(255, 255, 255, 0.2); border-top: 1px solid rgba(0,0,0,0.04); }
-        
         .input-wrapper { 
             display: flex; align-items: center; background: white; padding: 10px 20px; border-radius: 30px; gap: 14px; 
             box-shadow: 0 6px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.05); transition: 0.3s;
         }
         .input-wrapper:focus-within { border-color: #1da1f2; box-shadow: 0 6px 22px rgba(29,161,242,0.12); }
-        
         .icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #8899a6; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .icon-btn:hover { color: #1da1f2; transform: scale(1.08); }
         
         input[type="text"] { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; color: #2c3e50; }
         input[type="text"]::placeholder { color: #aab8c2; }
         
-        /* Khung Preview ảnh nhỏ */
         #imgPreviewBox { display: none; margin-bottom: 12px; padding: 6px; background: #fff; border: 1px solid #e1e4e8; border-radius: 14px; width: fit-content; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
         #imgPreview { max-height: 80px; border-radius: 10px; display: block; }
         #removeImgBtn { position: absolute; top: -6px; right: -6px; background: #ff4757; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 998; backdrop-filter: blur(4px); }
 
-        /* Tương thích hoàn hảo cho Điện Thoại */
         @media (max-width: 768px) {
             body { padding: 0; }
             .main-chat { padding: 0; }
@@ -217,11 +177,10 @@
             <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
             <div class="logo-text">MindGuard</div>
         </div>
-        <button class="new-chat-btn" onclick="clearHistory()"><i class="fa-solid fa-plus"></i> Cuộc trò chuyện mới</button>
+        <button class="new-chat-btn" onclick="createNewChat()"><i class="fa-solid fa-plus"></i> Cuộc trò chuyện mới</button>
         
         <div class="history-title">Lịch sử gần đây</div>
-        <div class="history-list">
-            <div class="history-item"><i class="fa-regular fa-comment-dots"></i> Phiên chat hiện tại</div>
+        <div class="history-list" id="historyList">
         </div>
         
         <div class="user-profile" onclick="document.getElementById('avatarInput').click()">
@@ -271,6 +230,10 @@
         let currentImageBase64 = null;
         const chatBox = document.getElementById('chatBox');
         
+        // BIẾN QUẢN LÝ NHIỀU PHIÊN CHAT
+        let chatSessions = JSON.parse(localStorage.getItem('mg_sessions')) || [];
+        let currentSessionId = localStorage.getItem('mg_current_session_id');
+        
         // POPUP ĐĂNG NHẬP
         function submitUserInfo() {
             const name = document.getElementById('usernameInput').value.trim();
@@ -281,16 +244,14 @@
                 return;
             }
             
-            USER_NAME = name;
-            TOKEN_ID = telId;
-            
+            USER_NAME = name; TOKEN_ID = telId;
             localStorage.setItem('mg_username', USER_NAME);
             localStorage.setItem('mg_token_id', TOKEN_ID);
             
             document.getElementById('displayUsername').innerText = USER_NAME;
             document.getElementById('loginOverlay').style.display = 'none';
             
-            initBotGreeting();
+            createNewChat(false); // Khởi tạo chat mới ngay khi đăng nhập
         }
 
         function toggleSidebar() {
@@ -300,7 +261,6 @@
 
         window.onload = () => {
             loadAvatar();
-            
             const savedName = localStorage.getItem('mg_username');
             const savedId = localStorage.getItem('mg_token_id');
             
@@ -309,28 +269,121 @@
                 TOKEN_ID = savedId;
                 document.getElementById('displayUsername').innerText = USER_NAME;
                 document.getElementById('loginOverlay').style.display = 'none';
-                loadHistory();
-                if (chatBox.innerHTML.trim() === "") initBotGreeting();
+                
+                // Khôi phục hoặc tạo mới phiên chat
+                if (!currentSessionId || chatSessions.length === 0) {
+                    createNewChat(false);
+                } else {
+                    loadSession(currentSessionId);
+                }
+                renderHistoryList();
             }
         };
 
         function initBotGreeting() {
+            chatBox.innerHTML = "";
             appendMessage("bot", `Ui xin chào ${USER_NAME} nha! Mình là MindGuard đây, hôm nay cậu có chuyện gì muốn trút bầu tâm sự với mình không nè? 💙`);
         }
 
-        function saveHistory() { localStorage.setItem('chatHistory', chatBox.innerHTML); }
-        function loadHistory() {
-            const history = localStorage.getItem('chatHistory');
-            if (history) { chatBox.innerHTML = history; chatBox.scrollTop = chatBox.scrollHeight; }
+        // ==========================================
+        // KHỐI LOGIC QUẢN LÝ NHIỀU PHIÊN CHAT
+        // ==========================================
+        function saveHistory() { 
+            let sessionIndex = chatSessions.findIndex(s => s.id == currentSessionId);
+            
+            // Tìm tin nhắn đầu tiên của user để làm Tiêu đề
+            let title = "Phiên chat mới";
+            const userMsgs = chatBox.querySelectorAll('.msg-row.user .msg-bubble');
+            if (userMsgs.length > 0) {
+                let text = userMsgs[0].textContent.trim();
+                title = text.substring(0, 25) + (text.length > 25 ? "..." : "");
+            }
+
+            const sessionData = {
+                id: currentSessionId,
+                title: title,
+                content: chatBox.innerHTML,
+            };
+
+            if (sessionIndex !== -1) {
+                chatSessions[sessionIndex] = sessionData; // Cập nhật
+            } else {
+                chatSessions.unshift(sessionData); // Thêm mới lên đầu
+            }
+
+            localStorage.setItem('mg_sessions', JSON.stringify(chatSessions));
+            localStorage.setItem('mg_current_session_id', currentSessionId);
+            renderHistoryList();
         }
-        function clearHistory() {
-            if(confirm("Bạn có chắc muốn xóa lịch sử trò chuyện này?")) {
-                localStorage.removeItem('chatHistory');
-                chatBox.innerHTML = "";
-                initBotGreeting();
+
+        function renderHistoryList() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = "";
+            
+            chatSessions.forEach(session => {
+                const isActive = (session.id == currentSessionId);
+                const div = document.createElement('div');
+                div.className = `history-item ${isActive ? 'active' : ''}`;
+                div.innerHTML = `
+                    <i class="fa-regular fa-comment-dots"></i> 
+                    <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${session.title}</span>
+                    <i class="fa-solid fa-trash" style="font-size: 13px; color: #ff4757; opacity: 0.6; cursor: pointer; padding: 4px;" 
+                       onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6" 
+                       onclick="deleteSession('${session.id}', event)"></i>
+                `;
+                div.onclick = () => loadSession(session.id);
+                historyList.appendChild(div);
+            });
+        }
+
+        function loadSession(id) {
+            currentSessionId = id;
+            localStorage.setItem('mg_current_session_id', id);
+            
+            const session = chatSessions.find(s => s.id == id);
+            if (session) {
+                chatBox.innerHTML = session.content;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            renderHistoryList();
+            if(window.innerWidth <= 768) toggleSidebar();
+        }
+
+        function createNewChat(confirmPrompt = true) {
+            // Không tạo nếu phiên hiện tại vẫn đang trống (chưa có tin nhắn của user)
+            const userMsgs = chatBox.querySelectorAll('.msg-row.user');
+            if (confirmPrompt && userMsgs.length === 0) {
+                alert("Cậu đang ở một phiên chat trống rồi nè, hãy bắt đầu trò chuyện nhé!");
                 if(window.innerWidth <= 768) toggleSidebar();
+                return;
+            }
+
+            currentSessionId = Date.now().toString();
+            localStorage.setItem('mg_current_session_id', currentSessionId);
+            
+            initBotGreeting();
+            saveHistory();
+            if(window.innerWidth <= 768) toggleSidebar();
+        }
+
+        function deleteSession(id, event) {
+            event.stopPropagation(); // Ngăn click nhầm vào việc mở phiên chat
+            if (confirm("Cậu có chắc muốn xóa lịch sử cuộc trò chuyện này không?")) {
+                chatSessions = chatSessions.filter(s => s.id != id);
+                localStorage.setItem('mg_sessions', JSON.stringify(chatSessions));
+                
+                if (currentSessionId == id) {
+                    if (chatSessions.length > 0) {
+                        loadSession(chatSessions[0].id);
+                    } else {
+                        createNewChat(false);
+                    }
+                } else {
+                    renderHistoryList();
+                }
             }
         }
+        // ==========================================
 
         // ĐỔI ẢNH ĐẠI DIỆN
         function changeAvatar(event) {
@@ -400,24 +453,18 @@
                 
                 const data = await response.json();
                 
-                // 1. Cập nhật lại nội dung text của AI
                 const textSpan = document.getElementById(loadingId);
                 textSpan.innerText = data.reply;
                 
-                // 2. Tạo và chèn thêm nút nghe tin nhắn vào giao diện
                 const msgContentArea = textSpan.closest('.msg-content-area');
                 const btn = document.createElement('button');
                 btn.className = 'tts-btn';
                 btn.innerHTML = "<i class='fa-solid fa-volume-low'></i> Nghe tin nhắn";
                 
-                // Gắn sự kiện click để đọc tin nhắn
-                btn.onclick = function() { 
-                    speakText(this, data.reply); 
-                }; 
-                
+                btn.onclick = function() { speakText(this, data.reply); }; 
                 msgContentArea.appendChild(btn);
 
-                saveHistory();
+                saveHistory(); // Lưu lại ngay sau khi AI trả lời xong
             } catch (error) {
                 document.getElementById(loadingId).innerText = "Mạng bên mình đang nghẽn chút xíu, cậu nhắn lại nhé!";
                 saveHistory();
@@ -458,7 +505,7 @@
             
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
-            saveHistory();
+            saveHistory(); // Lưu lại ngay khi hiển thị tin nhắn mới
         }
     </script>
 </body>
