@@ -399,7 +399,24 @@
                 });
                 
                 const data = await response.json();
-                document.getElementById(loadingId).innerText = data.reply;
+                
+                // 1. Cập nhật lại nội dung text của AI
+                const textSpan = document.getElementById(loadingId);
+                textSpan.innerText = data.reply;
+                
+                // 2. Tạo và chèn thêm nút nghe tin nhắn vào giao diện
+                const msgContentArea = textSpan.closest('.msg-content-area');
+                const btn = document.createElement('button');
+                btn.className = 'tts-btn';
+                btn.innerHTML = "<i class='fa-solid fa-volume-low'></i> Nghe tin nhắn";
+                
+                // Gắn sự kiện click để đọc tin nhắn
+                btn.onclick = function() { 
+                    speakText(this, data.reply); 
+                }; 
+                
+                msgContentArea.appendChild(btn);
+
                 saveHistory();
             } catch (error) {
                 document.getElementById(loadingId).innerText = "Mạng bên mình đang nghẽn chút xíu, cậu nhắn lại nhé!";
