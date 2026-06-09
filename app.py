@@ -7,10 +7,24 @@ import google.generativeai as genai
 app = Flask(__name__)
 
 # ==========================================
-# CẤU HÌNH API KEYS VÀ THÔNG TIN BẢO MẬT
+# 1. CẤU HÌNH BẢO MẬT VÀ DANH SÁCH NHẬN CẢNH BÁO
 # ==========================================
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-TELEGRAM_TOKEN = "8561921353:AAF8mzyV6ZEIe-x3eiwJEgQX90C1pKSngFc"
+TELEGRAM_TOKEN = "8561921353:AAF8mzyV6ZEIe-x3eiwJEgQX90C1pKSngFc" # <-- NHỚ ĐỔI TOKEN MỚI
+
+# --- DANH SÁCH CÁC BÊN NHẬN THÔNG BÁO ---
+# 1. ID của Cậu (Admin)
+ADMIN_ID = "5871531291" 
+
+# 2. Danh sách ID của Giáo viên (Có thể thêm nhiều ID cách nhau bằng dấu phẩy)
+TEACHER_IDS = ["ID_GIAO_VIEN_1", "ID_GIAO_VIEN_2"]
+
+# 3. Sổ liên lạc (Database) ghép Mã Học Sinh -> ID Telegram Phụ Huynh
+PARENT_DB = {
+    "HS001": "ID_TELEGRAM_PHU_HUYNH_1",
+    "HS002": "ID_TELEGRAM_PHU_HUYNH_2",
+    "HS003": "ID_TELEGRAM_PHU_HUYNH_3"
+}
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
@@ -18,36 +32,56 @@ else:
     print("⚠️ CẢNH BÁO: Chưa tìm thấy GEMINI_API_KEY trong Environment Variables!", flush=True)
 
 # ==========================================
-# HÀM TỰ ĐỘNG GỬI TIN BÁO ĐỘNG ĐẾN TELEGRAM
+# 2. HÀM TỰ ĐỘNG GỬI TIN BÁO ĐỘNG ĐẾN 3 BÊN
 # ==========================================
-def send_alert(msg, reply, chat_id, role, token_id, student_name):
-    text = f"🚨 MINDGUARD CẢNH BÁO NGUY HIỂM ({role}) 🚨\n"
-    text += f"👤 Học sinh: {student_name} (Mã Chat ID: {token_id})\n"
-    text += f"💬 Tin nhắn: {msg}\n"
-    text += f"🤖 Phân tích của Bot: {reply}"
+def send_alert(msg, reply, token_id, student_name):
+    # Tạo nội dung tin nhắn
+    text = f"🚨 MINDGUARD CẢNH BÁO KHẨN CẤP 🚨\n"
+    text += f"👤 Học sinh: {student_name} (Mã số: {token_id})\n"
+    text += f"💬 Lời tâm sự: {msg}\n"
+    text += f"🤖 AI Phân tích: {reply}\n"
+    text += f"⚠️ Xin hãy kiểm tra và hỗ trợ em ngay lập tức!"
     
+    # Gom tất cả những người cần gửi vào một danh sách (Dùng set để không bị gửi trùng)
+    receivers = set()
+    receivers.add(ADMIN_ID)
+    
+    for t_id in TEACHER_IDS:
+        receivers.add(t_id)
+        
+    # Tra cứu xem mã học sinh này có ID phụ huynh trong sổ không
+    parent_id = PARENT_DB.get(token_id)
+    if parent_id:
+        receivers.add(parent_id)
+    
+    # Gửi tin nhắn cho từng người trong danh sách
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    try:
-        requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=5)
-    except Exception as e:
-        print(f"Lỗi gửi Telegram: {e}", flush=True)
+    for chat_id in receivers:
+        if "ID_" in chat_id or not chat_id: # Bỏ qua nếu chưa điền ID thật
+            continue
+            
+        try:
+            requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=5)
+            print(f"✅ Đã gửi cảnh báo tới ID: {chat_id}", flush=True)
+        except Exception as e:
+            print(f"❌ Lỗi gửi Telegram cho ID {chat_id}: {e}", flush=True)
 
 # ==========================================
-# HÀM XỬ LÝ LỜI GỌI AI ĐỌC VỊ (GEMINI 2.5 FLASH)
+# 3. HÀM XỬ LÝ LỜI GỌI AI ĐỌC VỊ (GEMINI 2.5 FLASH)
 # ==========================================
 def get_ai_response(user_input, user_name, token_id, image_base64=None):
     if not GEMINI_API_KEY:
         return {"level": "Safe", "reply": "Chưa cấu hình GEMINI_API_KEY trên server!"}
 
-    # [ĐÃ SỬA]: Nâng cấp hệ thống Prompt thành Chuyên gia Tâm lý Học đường
     system_prompt = (
-        f"Bạn là MindGuard, một chuyên gia tâm lý học đường chuyên nghiệp, thấu cảm và sắc bén.\n"
+        f"Bạn là MindGuard, một chuyên gia tâm lý học đường chuyên nghiệp, thấu cảm, sắc bén và rất am hiểu tâm lý Gen Z.\n"
         f"Bạn đang trò chuyện trực tiếp, riêng tư với học sinh tên là {user_name} (ID: {token_id}).\n"
         "QUY TẮC GIAO TIẾP VÀ TÂM LÝ:\n"
         "1. KHÔNG GIẢ TRÂN: Tránh tuyệt đối những lời khuyên sáo rỗng hoặc các hành động ảo (như *ôm*, *xoa đầu*).\n"
         "2. ĐỘ DÀI VỪA PHẢI, ĐÁNH TRÚNG TÂM LÝ: Không trả lời cộc lốc 1-2 câu, cũng không viết văn bản dài dòng. Hãy dùng khoảng 3-4 câu súc tích. Đi thẳng vào cảm xúc cốt lõi mà học sinh đang trải qua.\n"
-        "3. KỸ NĂNG CHUYÊN GIA: Kỹ năng 'gọi tên cảm xúc' (ví dụ: 'Có vẻ như em đang cảm thấy uất ức vì...'). Sau khi đồng cảm, hãy đặt MỘT câu hỏi mở mang tính khơi gợi để học sinh tự nhìn nhận vấn đề hoặc kể thêm chi tiết.\n"
-        "4. XỬ LÝ KHỦNG HOẢNG: Nếu học sinh nhắc đến bạo lực, bắt nạt hoặc tự hại, hãy lập tức hỏi các thông tin thực tế (Chuyện xảy ra ở đâu? Em có đang an toàn/bị thương không?) để đánh giá mức độ rủi ro, không chỉ an ủi suông.\n"
+        "3. KỸ NĂNG CHUYÊN GIA: Kỹ năng 'gọi tên cảm xúc'. Sau khi đồng cảm, hãy đặt MỘT câu hỏi mở mang tính khơi gợi để học sinh tự nhìn nhận vấn đề hoặc kể thêm chi tiết.\n"
+        "4. XỬ LÝ KHỦNG HOẢNG: Nếu học sinh nhắc đến bạo lực, bắt nạt hoặc tự hại, hãy lập tức hỏi các thông tin thực tế để đánh giá mức độ rủi ro, không chỉ an ủi suông.\n"
+        "5. NGÔN NGỮ GEN Z: Xưng hô 'mình - cậu' hoặc 'anh/chị - em'. Khéo léo dùng các từ xu hướng (ví dụ: overthinking, suy, healing, bất ổn, red flag, thao túng tâm lý, xú cà na, vô tri, 10 điểm không có nhưng, flex...) để tạo sự gần gũi. LƯU Ý: Tuyệt đối KHÔNG dùng từ lóng và phải giữ thái độ nghiêm túc hoàn toàn nếu học sinh có dấu hiệu rủi ro cao (mức Danger).\n"
         "BẮT BUỘC TRẢ VỀ ĐÚNG ĐỊNH DẠNG JSON SAU:\n"
         '{"level": "Safe/Warning/Danger", "reply": "Nội dung câu trả lời của bạn"}'
     )
@@ -93,7 +127,7 @@ def get_ai_response(user_input, user_name, token_id, image_base64=None):
         }
 
 # ==========================================
-# CÁC ROUTE ĐƯỜNG DẪN URL
+# 4. CÁC ROUTE ĐƯỜNG DẪN URL
 # ==========================================
 @app.route('/')
 def home():
@@ -111,7 +145,7 @@ def chat():
         data = get_ai_response(user_msg, user_name, token_id, image_base64)
         
         if data.get('level') == 'Danger':
-            send_alert(user_msg, data.get('reply'), token_id, "Người dùng/Giáo viên", token_id, user_name)
+            send_alert(user_msg, data.get('reply'), token_id, user_name)
             
         return jsonify(data)
     except Exception as e:
